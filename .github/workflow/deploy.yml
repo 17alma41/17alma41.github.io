@@ -1,0 +1,37 @@
+name: Deploy Eleventy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Cambia esto si usas otra rama
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'  # Asegúrate de que coincida con la versión en tu proyecto
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the site
+        run: npx @11ty/eleventy
+
+      - name: Verify _site directory
+        run: ls -la ./_site
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: _site
+          keep_files: false
