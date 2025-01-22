@@ -7,16 +7,6 @@
 	</url>
 	
 	<url>
-		<loc>https://example.com/blog/secondpost/</loc>
-		<lastmod>2018-07-04</lastmod>
-	</url>
-	
-	<url>
-		<loc>https://example.com/blog/thirdpost/</loc>
-		<lastmod>2018-08-24</lastmod>
-	</url>
-	
-	<url>
 		<loc>https://example.com/blog/fourthpost/</loc>
 		<lastmod>2018-09-30</lastmod>
 	</url>
@@ -52,22 +42,12 @@
 	</url>
 	
 	<url>
-		<loc>https://example.com/tags/number-2/</loc>
+		<loc>https://example.com/tags/another-tag/</loc>
 		<lastmod>2025-01-22</lastmod>
 	</url>
 	
 	<url>
 		<loc>https://example.com/tags/second-tag/</loc>
-		<lastmod>2025-01-22</lastmod>
-	</url>
-	
-	<url>
-		<loc>https://example.com/tags/posts-with-two-tags/</loc>
-		<lastmod>2025-01-22</lastmod>
-	</url>
-	
-	<url>
-		<loc>https://example.com/tags/another-tag/</loc>
 		<lastmod>2025-01-22</lastmod>
 	</url>
 </urlset>
