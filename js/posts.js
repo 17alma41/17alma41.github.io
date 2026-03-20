@@ -10,7 +10,7 @@ class PostsManager {
         this.posts = [];
         this.filteredPosts = [];
         this.currentPage = 1;
-        this.postsPerPage = 3;
+        this.postsPerPage = 6;
         this.currentPostIndex = -1;
         
         this.init();
