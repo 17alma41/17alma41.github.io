@@ -4,31 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alvaro Roman | Portfolio</title>
-    <link rel="stylesheet" href="style2.css">
+    <link rel="stylesheet" href="style.css">
+    <!-- Marked.js para renderizar Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
 
     <div class="container">
         <aside class="sidebar">
-            <div class="profile-photo"></div>
+            <div class="profile-section">
+                <div class="profile-photo"></div>
+                <h1 class="profile-name">Álvaro Román</h1>
+            </div>
             
             <nav class="menu">
-                <div class="menu-item"><span class="box"></span> TEXTO 1</div>
-                <div class="menu-item"><span class="box"></span> TEXTO 2</div>
-                <div class="menu-item"><span class="box"></span> TEXTO 3</div>
-                <div class="menu-item"><span class="box"></span> TEXTO 4</div>
+                <ul>
+                    <li><a href="#home" class="menu-link"><span class="menu-icon">🏠</span><span class="menu-text">Home</span></a></li>
+                    <li><a href="#projects" class="menu-link"><span class="menu-icon">💼</span><span class="menu-text">Projects</span></a></li>
+                    <li><a href="#about" class="menu-link"><span class="menu-icon">👤</span><span class="menu-text">About</span></a></li>
+                </ul>
             </nav>
 
-            <div class="character-3d">
-                <div class="triangle"></div>
-            </div>
+            <footer class="sidebar-footer">
+                <div class="social-links">
+                    <a href="#" target="_blank" rel="noopener" title="GitHub">GitHub</a>
+                    <a href="#" target="_blank" rel="noopener" title="LinkedIn">LinkedIn</a>
+                    <a href="#" target="_blank" rel="noopener" title="Email">Email</a>
+                </div>
+            </footer>
         </aside>
 
-        <main class="main-content">
-            <h1 class="main-title">ALVARO ROMAN</h1>
-            
-            <section class="projects-section">
-                <h2 class="section-title">PROYECTOS</h2>
+        <main class="main-content">    
+            <!-- SECCIÓN HOME - CON POSTS INTEGRADOS -->
+            <section id="home-section" class="home-section">
+                
+                <!-- VISTA DE LISTA DE POSTS -->
+                <div id="posts-list-view" class="posts-list-view">
+                    <h2 class="section-title">Home</h2>
+                    <div id="posts-container" class="posts-container"></div>
+
+                    <!-- PAGINACIÓN MODERNA -->
+                    <div class="modern-pagination">
+                        <button id="prev-pagination-btn" class="pagination-arrow" aria-label="Página anterior">
+                            <span class="arrow">←</span>
+                        </button>
+                        <div id="pagination-numbers" class="pagination-numbers"></div>
+                        <button id="next-pagination-btn" class="pagination-arrow" aria-label="Página siguiente">
+                            <span class="arrow">→</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VISTA INDIVIDUAL DE POST -->
+                <div id="post-detail-view" class="post-detail-view hidden">
+                    <button id="back-to-posts-btn" class="back-button">← Volver</button>
+                    <article id="post-article" class="post-article">
+                        <header class="post-header">
+                            <h1 class="post-title-detail"></h1>
+                            <div class="post-meta-detail">
+                                <time class="post-date-detail"></time>
+                                <span class="post-category-badge"></span>
+                            </div>
+                        </header>
+                        <img id="post-featured-image" class="post-featured-image" alt="featured image">
+                        <div id="post-content" class="post-markdown-content"></div>
+                    </article>
+
+                    <!-- PAGINACIÓN POST INDIVIDUAL -->
+                    <div class="post-detail-pagination">
+                        <button id="post-prev-btn" class="post-nav-btn" aria-label="Post anterior">
+                            ← Post anterior
+                        </button>
+                        <button id="post-next-btn" class="post-nav-btn" aria-label="Siguiente post">
+                            Siguiente post →
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- SECCIÓN PROYECTOS -->
+            <section id="projects-section" class="projects-section hidden">
+                <h2 class="section-title">Projects</h2>
 
                 <div class="project-card">
                     <div class="project-thumb"></div>
@@ -47,6 +104,8 @@
             </section>
         </main>
     </div>
+
+    <script src="js/posts.js"></script>
 
 </body>
 </html>

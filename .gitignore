@@ -1,0 +1,158 @@
+# ============================================
+# DEPENDENCIAS
+# ============================================
+node_modules/
+package-lock.json
+npm-debug.log
+yarn.lock
+yarn-error.log
+
+# ============================================
+# ARCHIVOS GENERADOS (NO EDITAR)
+# ============================================
+# El archivo posts-data.json se genera automáticamente
+# pero si lo quieres versionado, comentar la siguiente línea
+# data/posts-data.json
+
+# ============================================
+# ARQUIVOS DEL SISTEMA OPERATIVO
+# ============================================
+# Windows
+Thumbs.db
+Desktop.ini
+.DS_Store
+.Thumbs.db
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+.directory
+.Trash-*
+
+# ============================================
+# ARCHIVOS DE EDITOR / IDE
+# ============================================
+# Visual Studio Code
+.vscode/
+*.code-workspace
+.vscode-server/
+
+# JetBrains IDEs
+.idea/
+.idea_modules/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+.swp
+.swo
+*~
+.vim/
+.netrwhist
+
+# Nano
+.nano_history
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ============================================
+# ARCHIVOS TEMPORALES
+# ============================================
+*.tmp
+*.temp
+*.log
+*.pid
+*.seed
+*.bak
+*.swp
+*~
+.DS_Store
+
+# ============================================
+# ARCHIVOS DE BUILD / DISTRIBUCIÓN
+# ============================================
+/build/
+/dist/
+/out/
+/.cache/
+/.parcel-cache
+
+# ============================================
+# ARCH IVOS DE DESARROLLO LOCAL
+# ============================================
+.env
+.env.local
+.env.*.local
+*.pem
+*.crt
+*.key
+
+# Configuración local
+config.local.js
+settings.local.js
+
+# ============================================
+# ARCHIVOS DE TESTING
+# ============================================
+/coverage/
+.nyc_output/
+/test-results/
+
+# ============================================
+# ARCHIVOS ESPECÍFICOS DEL PROYECTO
+# ============================================
+# Archivos de respaldo
+*.backup
+*.bak
+.backup/
+
+# Archivos de prueba personal
+test-file.md
+prueba.md
+temp/
+temp-*
+
+# Credenciales o información sensible (IMPORTANTE)
+.credentials
+secrets.json
+api-keys.json
+
+# ============================================
+# PATRONES A IGNORAR
+# ============================================
+# Archivos ocultos (excepto .gitignore)
+.*
+!.gitignore
+!.gitattributes
+
+# Logs de aplicación
+logs/
+*.log
+log
+
+# ============================================
+# NOTAS IMPORTANTES
+# ============================================
+# Este archivo previene que se suban:
+# 1. Dependencias (node_modules) - deben instalarse con npm install
+# 2. Archivos del sistema (Thumbs.db, .DS_Store)
+# 3. Configuración personal del IDE
+# 4. Archivos temporales y de caché
+# 5. Credenciales y claves sensibles
+#
+# Para incluir archivos específicos que están en .gitignore:
+# git add -f archivo-importante.txt
