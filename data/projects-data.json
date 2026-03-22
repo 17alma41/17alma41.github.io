@@ -19,7 +19,7 @@
       "slug": "portfolio-proyecto",
       "title": "Portfolio Seguridad",
       "description": "Portfolio profesional enfocado en cyberseguridad con renderizado dinámico de posts y búsqueda integrada.",
-      "image": "https://via.placeholder.com/400x250?text=Portfolio+Web",
+      "image": "../postImages/headerImage/sqlinjectionImage.png",
       "url": "https://github.com/17alma41/17alma41.github.io",
       "category": "Web",
       "technologies": ["HTML", "CSS", "JavaScript"],
