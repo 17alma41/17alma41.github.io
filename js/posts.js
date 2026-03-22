@@ -80,6 +80,12 @@ class PostsManager {
         
         if (postPrevBtn) postPrevBtn.addEventListener('click', () => this.previousPost());
         if (postNextBtn) postNextBtn.addEventListener('click', () => this.nextPost());
+        
+        // Búsqueda de posts
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
+        }
     }
     
     /**
@@ -139,6 +145,34 @@ class PostsManager {
     }
     
     /**
+     * Maneja la búsqueda de posts
+     */
+    handleSearch(searchTerm) {
+        const trimmedTerm = searchTerm.trim().toLowerCase();
+        
+        if (trimmedTerm === '') {
+            // Si vacío, mostrar todos los posts
+            this.filteredPosts = [...this.posts];
+        } else {
+            // Filtrar posts por título, descripción o categoría
+            this.filteredPosts = this.posts.filter(post => {
+                const searchableText = `
+                    ${post.title.toLowerCase()} 
+                    ${post.description.toLowerCase()} 
+                    ${post.category ? post.category.toLowerCase() : ''}
+                `.toLowerCase();
+                
+                return searchableText.includes(trimmedTerm);
+            });
+        }
+        
+        // Resetear a la primera página cuando se busca
+        this.currentPage = 1;
+        
+        // Redisplayar los posts con los resultados de búsqueda
+        this.displayPosts();
+    }
+    /**
      * Muestra los posts de la página actual (vista de lista)
      */
     displayPosts() {
@@ -150,7 +184,26 @@ class PostsManager {
         
         // Si no hay posts
         if (posts.length === 0) {
-            container.innerHTML = '<p style="text-align: center; padding: 40px; color: #718096;">No hay posts disponibles.</p>';
+            const searchInput = document.getElementById('search-input');
+            const isSearching = searchInput && searchInput.value.trim() !== '';
+            
+            const emptyMessage = isSearching 
+                ? 'No posts encontrados con esa búsqueda'
+                : 'No hay posts disponibles';
+            
+            const emptyIcon = isSearching ? '🔍' : '📝';
+            
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">${emptyIcon}</div>
+                    <h3 class="empty-state-title">${emptyMessage}</h3>
+                    <p class="empty-state-message">
+                        ${isSearching 
+                            ? 'Intenta con palabras clave diferentes' 
+                            : 'Todavía no hay posts para mostrar'}
+                    </p>
+                </div>
+            `;
         } else {
             container.innerHTML = posts.map(post => this.createPostCard(post)).join('');
             

@@ -2,7 +2,7 @@
 title: "SQL Injection Basics"
 description: "Comprende los fundamentos de SQL injection con ejemplos prácticos y técnicas de explotación"
 date: "2026-03-15"
-image: "https://via.placeholder.com/240x160?text=SQL+Injection"
+image: "../postImages/headerImage/sqlinjectionImage.png"
 category: "Attacks"
 ---
 

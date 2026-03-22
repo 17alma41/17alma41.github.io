@@ -1,5 +1,5 @@
 {
-  "generated": "2026-03-20T10:51:11.832Z",
+  "generated": "2026-03-22T10:24:42.667Z",
   "totalPosts": 5,
   "categories": [
     {
@@ -30,7 +30,7 @@
       "title": "SQL Injection Basics",
       "description": "Comprende los fundamentos de SQL injection con ejemplos prácticos y técnicas de explotación",
       "date": "2026-03-15",
-      "image": "https://via.placeholder.com/240x160?text=SQL+Injection",
+      "image": "../postImages/headerImage/sqlinjectionImage.png",
       "category": "Attacks",
       "content": "# SQL Injection: Guía Completa para Principiantes\n\nSQL Injection es una de las vulnerabilidades web más comunes y peligrosas. En este post aprenderemos cómo funcionan estos ataques y cómo detectarlos.\n\n## ¿Qué es SQL Injection?\n\nUn ataque de SQL injection ocurre cuando un atacante inserta código SQL malicioso en un campo de entrada de una aplicación web. Esto permite al atacante:\n\n- Extraer datos de la base de datos\n- Modificar o eliminar información\n- Ejecutar comandos con privilegios de base de datos\n\n## Ejemplo vulnerable\n\n```php\n$username = $_POST['username'];\n$password = $_POST['password'];\n$query = \"SELECT * FROM users WHERE username = '$username' AND password = '$password'\";\n$result = mysqli_query($conn, $query);\n```\n\nEn este ejemplo, un atacante podría ingresar `' OR '1'='1` como username y bypassear la autenticación.\n\n## Prevención\n\n- Usar prepared statements\n- Validar entrada de usuario\n- Implementar WAF\n- Usar ORM frameworks\n\nContinúa leyendo el artículo completo para aprender técnicas avanzadas...",
       "filename": "sql-injection-basics.md",
