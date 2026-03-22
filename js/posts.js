@@ -300,6 +300,11 @@ class PostsManager {
         // Renderizar Markdown a HTML
         let htmlContent = '';
         if (typeof marked !== 'undefined') {
+            // Configurar marked para mejor renderizado
+            marked.setOptions({
+                breaks: true,
+                gfm: true
+            });
             htmlContent = marked.parse(post.content);
         } else {
             // Fallback: mostrar contenido sin procesar
@@ -310,6 +315,7 @@ class PostsManager {
         
         // Cambiar vista
         this.showDetailView();
+        this.updatePostNavigation();
         this.scrollToSection();
     }
     
@@ -361,25 +367,41 @@ class PostsManager {
     }
     
     /**
-     * Muestra la vista de lista
+     * Muestra la vista de lista con transición suave
      */
     showListView() {
         const listView = document.getElementById('posts-list-view');
         const detailView = document.getElementById('post-detail-view');
         
-        if (listView) listView.classList.remove('hidden');
-        if (detailView) detailView.classList.add('hidden');
+        if (detailView) {
+            detailView.classList.add('hidden');
+        }
+        
+        // Pequeño delay para que la animación sea suave
+        setTimeout(() => {
+            if (listView) {
+                listView.classList.remove('hidden');
+            }
+        }, 50);
     }
     
     /**
-     * Muestra la vista de detalle
+     * Muestra la vista de detalle con transición suave
      */
     showDetailView() {
         const listView = document.getElementById('posts-list-view');
         const detailView = document.getElementById('post-detail-view');
         
-        if (listView) listView.classList.add('hidden');
-        if (detailView) detailView.classList.remove('hidden');
+        if (listView) {
+            listView.classList.add('hidden');
+        }
+        
+        // Pequeño delay para que la animación sea suave
+        setTimeout(() => {
+            if (detailView) {
+                detailView.classList.remove('hidden');
+            }
+        }, 50);
     }
     
     /**
@@ -388,7 +410,13 @@ class PostsManager {
     scrollToSection() {
         const section = document.getElementById('home-section');
         if (section) {
-            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Dar un pequeño delay para asegurar que el DOM esté actualizado
+            setTimeout(() => {
+                section.parentElement.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }, 100);
         }
     }
     

@@ -209,6 +209,7 @@ body {
     border-bottom: 3px solid #667eea;
     padding-bottom: 15px;
     display: inline-block;
+    animation: slideInDown 0.4s ease-out;
 }
 
 /* ========================================
@@ -274,6 +275,28 @@ body {
     flex-direction: column;
     gap: 24px;
     margin-bottom: 40px;
+}
+
+/* Transiciones suaves entre vistas */
+.posts-list-view,
+.post-detail-view {
+    transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out;
+}
+
+.posts-list-view.hidden,
+.post-detail-view.hidden {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    pointer-events: none;
+}
+
+.posts-list-view:not(.hidden),
+.post-detail-view:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+    pointer-events: auto;
 }
 
 .post-card {
@@ -511,8 +534,42 @@ body {
    ======================================== */
 .post-detail-view {
     width: 100%;
-    max-width: 900px;
-    margin: 0 auto;
+    min-height: 100%;
+    position: relative;
+}
+
+/* Animaciones de entrada */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .back-button {
@@ -521,12 +578,13 @@ body {
     gap: 8px;
     background: transparent;
     color: #667eea;
-    border: none;
+    border: 2px solid transparent;
     cursor: pointer;
     font-weight: 600;
-    font-size: 1rem;
-    margin-bottom: 30px;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
     padding: 0;
+    border-radius: 0;
     transition: all 0.2s ease;
 }
 
@@ -536,16 +594,17 @@ body {
 }
 
 .post-article {
-    background: white;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    padding: 40px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background: transparent;
+    border-radius: 0;
+    animation: slideUp 0.5s ease-out;
+    border: none;
+    padding: 0;
+    box-shadow: none;
 }
 
 .post-header {
     margin-bottom: 30px;
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: 1px solid #e2e8f0;
     padding-bottom: 20px;
 }
 
@@ -553,7 +612,7 @@ body {
     font-size: 2.4rem;
     font-weight: 700;
     color: #1a202c;
-    margin: 0 0 20px 0;
+    margin: 0 0 15px 0;
     line-height: 1.3;
 }
 
@@ -591,10 +650,10 @@ body {
 
 .post-featured-image {
     width: 100%;
-    max-height: 400px;
+    max-height: 500px;
     object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 40px;
+    border-radius: 0;
+    margin: 30px 0 40px 0;
 }
 
 /* ========================================
@@ -604,6 +663,8 @@ body {
     color: #2d3748;
     line-height: 1.8;
     font-size: 1rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .post-markdown-content h2 {
@@ -787,7 +848,7 @@ body {
     }
 
     .post-article {
-        padding: 30px;
+        padding: 0;
     }
 
     .post-title-detail {
@@ -855,4 +916,65 @@ body {
     .post-nav-btn {
         width: 100%;
     }
+}
+
+/* ========================================
+   SECCIÓN ABOUT
+   ======================================== */
+.about-section {
+    width: 100%;
+}
+
+.about-content {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    padding: 40px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.about-content p {
+    color: #2d3748;
+    font-size: 1rem;
+    line-height: 1.8;
+    margin-bottom: 16px;
+}
+
+/* ========================================
+   MEJORAS DE EXPERIENCIA INTEGRADA
+   ======================================== */
+
+/* Mejorar height consistency en tarjetas */
+.post-card {
+    min-height: auto;
+    overflow: hidden;
+}
+
+/* Efecto suave en hover del card */
+.post-card {
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.post-card:hover {
+    box-shadow: 0 12px 28px rgba(102, 126, 234, 0.15);
+}
+
+/* Mejorar visibilidad del contenido post */
+.post-content {
+    max-height: none;
+}
+
+/* Asegurar que el main-content sea el contenedor correcto */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.home-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 }
