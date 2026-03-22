@@ -561,7 +561,7 @@ class ProjectsManager {
     }
     
     /**
-     * Configura los event listeners
+     * Configura los event listeners - SOLO UNA VEZ al inicializar
      */
     setupEventListeners() {
         // Búsqueda
@@ -570,12 +570,36 @@ class ProjectsManager {
             searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
         }
         
-        // Paginación
+        // Paginación - Botones de flecha
         const prevBtn = document.getElementById('projects-prev-pagination-btn');
         const nextBtn = document.getElementById('projects-next-pagination-btn');
         
-        if (prevBtn) prevBtn.addEventListener('click', () => this.previousPage());
-        if (nextBtn) nextBtn.addEventListener('click', () => this.nextPage());
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                if (!prevBtn.disabled) {
+                    this.previousPage();
+                }
+            });
+        }
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (!nextBtn.disabled) {
+                    this.nextPage();
+                }
+            });
+        }
+        
+        // Paginación - Números de página (delegación de eventos)
+        const numbersContainer = document.getElementById('projects-pagination-numbers');
+        if (numbersContainer) {
+            numbersContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('page-number')) {
+                    const pageNum = parseInt(e.target.dataset.page);
+                    this.goToPage(pageNum);
+                }
+            });
+        }
     }
     
     /**
@@ -601,50 +625,7 @@ class ProjectsManager {
         
         // Resetear a la primera página cuando se busca
         this.currentPage = 1;
-        
         this.displayProjects();
-    }
-    
-    /**
-     * Muestra los proyectos paginados
-     */
-    displayProjects() {
-        const container = document.getElementById('projects-container');
-        if (!container) return;
-        
-        const paginatedProjects = this.getPaginatedProjects();
-        const totalPages = this.getTotalPages();
-        
-        if (this.filteredProjects.length === 0) {
-            const searchInput = document.getElementById('projects-search-input');
-            const isSearching = searchInput && searchInput.value.trim() !== '';
-            
-            const emptyMessage = isSearching 
-                ? 'No projects encontrados con esa búsqueda'
-                : 'No hay proyectos disponibles';
-            
-            const emptyIcon = isSearching ? '🔍' : '💼';
-            
-            container.innerHTML = `
-                <div class="empty-state" style="grid-column: 1 / -1;">
-                    <div class="empty-state-icon">${emptyIcon}</div>
-                    <h3 class="empty-state-title">${emptyMessage}</h3>
-                    <p class="empty-state-message">
-                        ${isSearching 
-                            ? 'Intenta con palabras clave diferentes' 
-                            : 'Todavía no hay proyectos para mostrar'}
-                    </p>
-                </div>
-            `;
-            // Ocultar paginación si no hay resultados
-            const pagination = document.getElementById('projects-pagination');
-            if (pagination) pagination.style.display = 'none';
-        } else {
-            container.innerHTML = paginatedProjects.map(project => this.createProjectCard(project)).join('');
-            
-            // Mostrar y actualizar paginación
-            this.updatePagination(totalPages);
-        }
     }
     
     /**
@@ -664,44 +645,73 @@ class ProjectsManager {
     }
     
     /**
-     * Actualiza la paginación
+     * Va a una página específica
      */
-    updatePagination(totalPages) {
-        const paginationDiv = document.getElementById('projects-pagination');
-        if (!paginationDiv) return;
-        
-        // Mostrar paginación si hay múltiples páginas
-        if (totalPages <= 1) {
-            paginationDiv.style.display = 'none';
-            return;
-        }
-        
-        paginationDiv.style.display = 'flex';
-        
-        // Actualizar botones de navegación
-        const prevBtn = document.getElementById('projects-prev-pagination-btn');
-        const nextBtn = document.getElementById('projects-next-pagination-btn');
-        
-        if (prevBtn) prevBtn.disabled = this.currentPage === 1;
-        if (nextBtn) nextBtn.disabled = this.currentPage === totalPages;
-        
-        // Generar números de página
-        const numbersContainer = document.getElementById('projects-pagination-numbers');
-        if (numbersContainer) {
-            numbersContainer.innerHTML = this.generatePageNumbers(this.currentPage, totalPages);
-            
-            // Agregar listeners a los números
-            document.querySelectorAll('.page-number').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const pageNum = parseInt(btn.dataset.page);
-                    this.goToPage(pageNum);
-                });
-            });
+    goToPage(pageNum) {
+        const totalPages = this.getTotalPages();
+        if (pageNum >= 1 && pageNum <= totalPages) {
+            this.currentPage = pageNum;
+            this.displayProjects();
+            this.updatePaginationUI();
         }
     }
     
     /**
-     * Genera HTML para los números de página
+     * Va a la página anterior
+     */
+    previousPage() {
+        if (this.currentPage > 1) {
+            this.currentPage--;
+            this.displayProjects();
+            this.updatePaginationUI();
+        }
+    }
+    
+    /**
+     * Va a la página siguiente
+     */
+    nextPage() {
+        const totalPages = this.getTotalPages();
+        if (this.currentPage < totalPages) {
+            this.currentPage++;
+            this.displayProjects();
+            this.updatePaginationUI();
+        }
+    }
+    
+    /**
+     * Actualiza la UI de paginación (estado de botones y números)
+     */
+    updatePaginationUI() {
+        const totalPages = this.getTotalPages();
+        const prevBtn = document.getElementById('projects-prev-pagination-btn');
+        const nextBtn = document.getElementById('projects-next-pagination-btn');
+        const numbersContainer = document.getElementById('projects-pagination-numbers');
+        const paginationDiv = document.getElementById('projects-pagination');
+        
+        // Mostrar/ocultar paginación
+        if (paginationDiv) {
+            paginationDiv.style.display = totalPages > 1 ? 'flex' : 'none';
+        }
+        
+        // Actualizar estado de botones de flecha
+        if (prevBtn) {
+            prevBtn.disabled = this.currentPage === 1;
+            prevBtn.setAttribute('aria-disabled', prevBtn.disabled);
+        }
+        if (nextBtn) {
+            nextBtn.disabled = this.currentPage === totalPages;
+            nextBtn.setAttribute('aria-disabled', nextBtn.disabled);
+        }
+        
+        // Regenerar números de página
+        if (numbersContainer) {
+            numbersContainer.innerHTML = this.generatePageNumbers(this.currentPage, totalPages);
+        }
+    }
+    
+    /**
+     * Genera HTML para los números de página con puntos suspensivos
      */
     generatePageNumbers(currentPage, totalPages) {
         if (totalPages <= 1) return '';
@@ -722,10 +732,10 @@ class ProjectsManager {
             html += '<span class="page-ellipsis">...</span>';
         }
         
-        // Números
+        // Números de página
         for (let i = startPage; i <= endPage; i++) {
             const isActive = i === currentPage ? 'active' : '';
-            html += `<button class="page-number ${isActive}" data-page="${i}">${i}</button>`;
+            html += `<button class="page-number ${isActive}" data-page="${i}" aria-label="Página ${i}">${i}</button>`;
         }
         
         // Puntos suspensivos al final
@@ -737,36 +747,42 @@ class ProjectsManager {
     }
     
     /**
-     * Va a una página específica
+     * Muestra los proyectos de la página actual
      */
-    goToPage(pageNum) {
-        if (pageNum >= 1 && pageNum <= this.getTotalPages()) {
-            this.currentPage = pageNum;
-            this.displayProjects();
+    displayProjects() {
+        const container = document.getElementById('projects-container');
+        if (!container) return;
+        
+        const paginatedProjects = this.getPaginatedProjects();
+        
+        if (paginatedProjects.length === 0) {
+            const searchInput = document.getElementById('projects-search-input');
+            const isSearching = searchInput && searchInput.value.trim() !== '';
+            
+            const emptyMessage = isSearching 
+                ? 'No projects encontrados con esa búsqueda'
+                : 'No hay proyectos disponibles';
+            
+            const emptyIcon = isSearching ? '🔍' : '💼';
+            
+            container.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <div class="empty-state-icon">${emptyIcon}</div>
+                    <h3 class="empty-state-title">${emptyMessage}</h3>
+                    <p class="empty-state-message">
+                        ${isSearching 
+                            ? 'Intenta con palabras clave diferentes' 
+                            : 'Todavía no hay proyectos para mostrar'}
+                    </p>
+                </div>
+            `;
+        } else {
+            container.innerHTML = paginatedProjects.map(project => this.createProjectCard(project)).join('');
         }
+        
+        // Actualizar UI de paginación
+        this.updatePaginationUI();
     }
-    
-    /**
-     * Va a la página anterior
-     */
-    previousPage() {
-        if (this.currentPage > 1) {
-            this.currentPage--;
-            this.displayProjects();
-        }
-    }
-    
-    /**
-     * Va a la página siguiente
-     */
-    nextPage() {
-        const totalPages = this.getTotalPages();
-        if (this.currentPage < totalPages) {
-            this.currentPage++;
-            this.displayProjects();
-        }
-    }
-    
     
     /**
      * Crea el HTML de una tarjeta de proyecto

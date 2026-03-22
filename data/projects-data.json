@@ -1,0 +1,194 @@
+{
+  "generated": "2026-03-22T10:00:00.000Z",
+  "totalProjects": 16,
+  "categories": [
+    {
+      "name": "Web",
+      "slug": "web",
+      "count": 11
+    },
+    {
+      "name": "Herramientas",
+      "slug": "tools",
+      "count": 5
+    }
+  ],
+  "projects": [
+    {
+      "id": "project-1",
+      "slug": "portfolio-proyecto",
+      "title": "Portfolio Seguridad",
+      "description": "Portfolio profesional enfocado en cyberseguridad con renderizado dinámico de posts y búsqueda integrada.",
+      "image": "https://via.placeholder.com/400x250?text=Portfolio+Web",
+      "url": "https://github.com/17alma41/17alma41.github.io",
+      "category": "Web",
+      "technologies": ["HTML", "CSS", "JavaScript"],
+      "featured": true
+    },
+    {
+      "id": "project-2",
+      "slug": "herramienta-analisis",
+      "title": "Herramienta de Análisis de Vulnerabilidades",
+      "description": "Herramienta para análisis y monitoreo de vulnerabilidades en aplicaciones web con reportes automatizados.",
+      "image": "https://via.placeholder.com/400x250?text=Analisis",
+      "url": "https://github.com/17alma41",
+      "category": "Herramientas",
+      "technologies": ["Python", "Flask", "SQL"],
+      "featured": false
+    },
+    {
+      "id": "project-3",
+      "slug": "ctf-solver",
+      "title": "CTF Challenge Solver",
+      "description": "Plataforma interactiva para resolver y crear desafíos de Capture The Flag con tutoriales integrados.",
+      "image": "https://via.placeholder.com/400x250?text=CTF+Platform",
+      "url": "https://github.com/17alma41",
+      "category": "Web",
+      "technologies": ["React", "Node.js", "MongoDB"],
+      "featured": true
+    },
+    {
+      "id": "project-4",
+      "slug": "log-analyzer",
+      "title": "Advanced Log Analyzer",
+      "description": "Analizador avanzado de logs con detección de anomalías y patrones de ataque mediante machine learning.",
+      "image": "https://via.placeholder.com/400x250?text=Log+Analyzer",
+      "url": "https://github.com/17alma41/log-analyzer",
+      "category": "Web",
+      "technologies": ["Python", "TensorFlow", "React"],
+      "featured": true
+    },
+    {
+      "id": "project-5",
+      "slug": "network-scanner",
+      "title": "Network Vulnerability Scanner",
+      "description": "Escáner de red avanzado para identificar vulnerabilidades y servicios expuestos en infraestructura.",
+      "image": "https://via.placeholder.com/400x250?text=Network+Scanner",
+      "url": "https://github.com/17alma41",
+      "category": "Herramientas",
+      "technologies": ["Python", "Scapy", "SQLite"],
+      "featured": false
+    },
+    {
+      "id": "project-6",
+      "slug": "password-cracker",
+      "title": "Herramienta de Cracking de Contraseñas",
+      "description": "Herramienta educativa para testing de contraseñas con múltiples algoritmos de hash.",
+      "image": "https://via.placeholder.com/400x250?text=Password+Cracker",
+      "url": "https://github.com/17alma41",
+      "category": "Herramientas",
+      "technologies": ["Python", "Hashlib", "Threading"],
+      "featured": false
+    },
+    {
+      "id": "project-7",
+      "slug": "api-security-tester",
+      "title": "API Security Testing Framework",
+      "description": "Framework completo para testing de seguridad en APIs REST con automatización de pruebas.",
+      "image": "https://via.placeholder.com/400x250?text=API+Security",
+      "url": "https://github.com/17alma41",
+      "category": "Web",
+      "technologies": ["Python", "Requests", "FastAPI"],
+      "featured": true
+    },
+    {
+      "id": "project-8",
+      "slug": "malware-analyzer",
+      "title": "Malware Analysis Platform",
+      "description": "Plataforma web para análisis estático de malware con extracción de IOCs y reportes detallados.",
+      "image": "https://via.placeholder.com/400x250?text=Malware+Analysis",
+      "url": "https://github.com/17alma41",
+      "category": "Web",
+      "technologies": ["React", "Python", "Django"],
+      "featured": true
+    },
+    {
+      "id": "project-9",
+      "slug": "phishing-detector",
+      "title": "Phishing Email Detector",
+      "description": "Sistema de detección de emails de phishing usando machine learning y análisis de características.",
+      "image": "https://via.placeholder.com/400x250?text=Phishing+Detector",
+      "url": "https://github.com/17alma41",
+      "category": "Herramientas",
+      "technologies": ["Python", "NLP", "Scikit-learn"],
+      "featured": false
+    },
+    {
+      "id": "project-10",
+      "slug": "firewall-rules-optimizer",
+      "title": "Firewall Rules Optimizer",
+      "description": "Herramienta para optimizar y analizar reglas de firewall, eliminar redundancias y mejorar rendimiento.",
+      "image": "https://via.placeholder.com/400x250?text=Firewall+Optimizer",
+      "url": "https://github.com/17alma41",
+      "category": "Herramientas",
+      "technologies": ["Go", "Python", "iptables"],
+      "featured": false
+    },
+    {
+      "id": "project-11",
+      "slug": "ssl-certificate-monitor",
+      "title": "SSL Certificate Monitoring Dashboard",
+      "description": "Dashboard en tiempo real para monitoreo de certificados SSL/TLS con alertas de vencimiento.",
+      "image": "https://via.placeholder.com/400x250?text=SSL+Monitor",
+      "url": "https://github.com/17alma41",
+      "category": "Web",
+      "technologies": ["Vue.js", "Node.js", "MongoDB"],
+      "featured": true
+    },
+    {
+      "id": "project-12",
+      "slug": "incident-response-automation",
+      "title": "Incident Response Automation",
+      "description": "Sistema automatizado para respuesta a incidentes de seguridad con playbooks y alertas inteligentes.",
+      "image": "https://via.placeholder.com/400x250?text=Incident+Response",
+      "url": "https://github.com/17alma41",
+      "category": "Web",
+      "technologies": ["Python", "Ansible", "Elasticsearch"],
+      "featured": true
+    },
+    {
+      "id": "project-13",
+      "slug": "data-exfiltration-detector",
+      "title": "Data Exfiltration Detector",
+      "description": "Herramienta para detectar y prevenir exfiltración de datos usando análisis de tráfico de red.",
+      "image": "https://via.placeholder.com/400x250?text=Exfiltration+Detector",
+      "url": "https://github.com/17alma41",
+      "category": "Herramientas",
+      "technologies": ["Python", "Wireshark", "TensorFlow"],
+      "featured": false
+    },
+    {
+      "id": "project-14",
+      "slug": "crypto-wallet-audit",
+      "title": "Crypto Wallet Security Auditor",
+      "description": "Herramienta de auditoría de seguridad para wallets de criptomonedas y análisis de transacciones.",
+      "image": "https://via.placeholder.com/400x250?text=Crypto+Wallet",
+      "url": "https://github.com/17alma41",
+      "category": "Web",
+      "technologies": ["Python", "Web3.py", "React"],
+      "featured": true
+    },
+    {
+      "id": "project-15",
+      "slug": "container-security-scanner",
+      "title": "Container Security Scanner",
+      "description": "Scanner de seguridad especializado en Docker y Kubernetes para detectar vulnerabilidades en contenedores.",
+      "image": "https://via.placeholder.com/400x250?text=Container+Security",
+      "url": "https://github.com/17alma41",
+      "category": "Herramientas",
+      "technologies": ["Go", "Docker", "Kubernetes"],
+      "featured": false
+    },
+    {
+      "id": "project-16",
+      "slug": "threat-intelligence-dashboard",
+      "title": "Threat Intelligence Dashboard",
+      "description": "Dashboard integrado con feeds de inteligencia de amenazas para monitoreo de IOCs en tiempo real.",
+      "image": "https://via.placeholder.com/400x250?text=Threat+Intelligence",
+      "url": "https://github.com/17alma41",
+      "category": "Web",
+      "technologies": ["React", "Redux", "GraphQL"],
+      "featured": true
+    }
+  ]
+}

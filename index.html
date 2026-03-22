@@ -99,21 +99,33 @@
 
             <!-- SECCIÓN PROYECTOS -->
             <section id="projects-section" class="projects-section hidden">
-                <h2 class="section-title">Projects</h2>
-
-                <div class="project-card">
-                    <div class="project-thumb"></div>
-                    <p class="project-desc">DESCRIPCION DE PROYECTO</p>
+                <div class="section-header">
+                    <h2 class="section-title">Projects</h2>
+                    <div class="search-container">
+                        <input 
+                            type="text" 
+                            id="projects-search-input" 
+                            class="search-input" 
+                            placeholder="Buscar proyectos..." 
+                            aria-label="Buscar proyectos">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
                 </div>
 
-                <div class="project-card">
-                    <div class="project-thumb"></div>
-                    <p class="project-desc">DESCRIPCION DE PROYECTO</p>
-                </div>
-                
-                <div class="project-card">
-                    <div class="project-thumb"></div>
-                    <p class="project-desc">DESCRIPCION DE PROYECTO</p>
+                <div id="projects-container" class="projects-container"></div>
+
+                <!-- PAGINACIÓN PROYECTOS -->
+                <div class="modern-pagination" id="projects-pagination">
+                    <button id="projects-prev-pagination-btn" class="pagination-arrow" aria-label="Página anterior">
+                        <span class="arrow">←</span>
+                    </button>
+                    <div id="projects-pagination-numbers" class="pagination-numbers"></div>
+                    <button id="projects-next-pagination-btn" class="pagination-arrow" aria-label="Página siguiente">
+                        <span class="arrow">→</span>
+                    </button>
                 </div>
             </section>
 
@@ -127,7 +139,7 @@
         </main>
     </div>
 
-    <script src="js/posts.js"></script>
+    <script src="js/script.js"></script>
 
 </body>
 </html>
