@@ -19,6 +19,56 @@ body {
     overflow: hidden;
 }
 
+
+/* ========================================
+   BOTÓN HAMBURGUESA (MENÚ MÓVIL)
+   ======================================== */
+.hamburger-menu {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 999;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.hamburger-menu:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.hamburger-menu span {
+    display: block;
+    width: 24px;
+    height: 2.5px;
+    background: white;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.hamburger-menu.active span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
+}
+
+.hamburger-menu.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-menu.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(8px, -8px);
+}
+
 /* ========================================
    CONTENEDOR Y LAYOUT PRINCIPAL
    ======================================== */
@@ -170,6 +220,14 @@ body {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+}
+
+/* En móvil, el main-content debe tomar todo el ancho */
+@media (max-width: 768px) {
+    .main-content {
+        flex: 1 0 auto;
+        width: 100%;
+    }
 }
 
 /* Scroll suave */
@@ -981,9 +1039,18 @@ body {
 }
 
 /* ========================================
-   RESPONSIVE
+   RESPONSIVE - TABLETS (1024px y menos)
    ======================================== */
 @media (max-width: 1024px) {
+    .sidebar {
+        width: 240px;
+        padding: 30px 20px;
+    }
+
+    .main-content {
+        padding: 50px 60px;
+    }
+
     .section-header {
         flex-direction: column;
         align-items: flex-start;
@@ -996,25 +1063,17 @@ body {
     }
 
     .post-card {
-        flex-direction: column;
+        gap: 16px;
+        padding: 16px;
     }
 
     .post-image {
-        width: 100%;
-        height: 200px;
+        width: 180px;
+        height: 140px;
     }
 
-    .post-header {
-        flex-direction: column;
-    }
-
-    .post-category {
-        margin-left: 0;
-        margin-top: 8px;
-    }
-
-    .post-article {
-        padding: 0;
+    .post-title {
+        font-size: 1.1rem;
     }
 
     .post-title-detail {
@@ -1023,26 +1082,89 @@ body {
 
     .projects-container {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 24px;
+        gap: 20px;
+    }
+
+    .project-thumbnail {
+        height: 180px;
     }
 }
 
+/* ========================================
+   RESPONSIVE - TABLETS PEQUEÑAS (768px y menos)
+   ======================================== */
 @media (max-width: 768px) {
-    .sidebar {
+    body {
+        overflow-y: auto;
+    }
+
+    /*Mostrar el título de la página en medio*/
+
+    .section-title {
+        text-align: center;
         width: 100%;
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    /* Mostrar hamburguesa */
+    .hamburger-menu {
+        display: flex;
+    }
+
+    /* Sidebar como overlay en móvil */
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        top: 0;
+        width: 280px;
+        height: 100vh;
+        flex-direction: column;
+        z-index: 900;
+        transition: left 0.3s ease;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+        padding: 60px 25px 30px;
+        overflow-y: auto;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    /* Overlay cuando el menú está abierto */
+    .sidebar.active::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: -1;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .container {
         height: auto;
-        flex-direction: row;
+        flex-direction: column;
+    }
+
+    .main-content {
         padding: 20px;
+        min-height: 100vh;
     }
 
     .section-header {
         flex-direction: column;
         gap: 15px;
+        margin-bottom: 25px;
     }
 
     .section-title {
-        font-size: 1.1rem;
+        font-size: 1.3rem;
         margin-bottom: 0;
+        padding-bottom: 10px;
+        border-bottom-width: 2px;
     }
 
     .search-container {
@@ -1059,62 +1181,165 @@ body {
         height: 16px;
     }
 
-    .main-content {
-        padding: 40px 20px;
+    /* Posts */
+    .post-card {
+        flex-direction: column;
+        gap: 12px;
+        padding: 14px;
     }
 
-    .section-title {
-        font-size: 1.8rem;
+    .post-image {
+        width: 100%;
+        height: 180px;
+        margin: 0;
     }
 
-    .pagination {
-        flex-wrap: wrap;
+    .post-content {
+        gap: 8px;
+    }
+
+    .post-title {
+        font-size: 1.1rem;
+    }
+
+    .post-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .post-category {
+        margin-left: 0;
+        margin-top: 8px;
+    }
+
+    .post-description {
+        font-size: 0.9rem;
+        -webkit-line-clamp: 2;
+    }
+
+    .post-meta {
+        font-size: 0.8rem;
         gap: 12px;
     }
 
+    /* Paginación */
+    .pagination {
+        gap: 12px;
+        margin-top: 30px;
+        padding-top: 20px;
+    }
+
+    .pagination-btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+
+    .page-info {
+        font-size: 0.9rem;
+        min-width: 80px;
+    }
+
     .modern-pagination {
-        gap: 10px;
+        gap: 8px;
+        margin-top: 30px;
+        padding-top: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
     }
 
     .pagination-arrow {
         width: 36px;
         height: 36px;
+        font-size: 0.9rem;
+    }
+
+    .pagination-numbers {
+        gap: 4px;
     }
 
     .page-number {
         min-width: 32px;
         height: 32px;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
+    }
+
+    /* Vista individual de post */
+    .post-detail-view {
+        min-height: auto;
     }
 
     .post-article {
-        padding: 20px;
+        padding: 0;
     }
 
     .post-title-detail {
-        font-size: 1.6rem;
+        font-size: 1.5rem;
+        margin-bottom: 12px;
+    }
+
+    .post-meta-detail {
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .post-featured-image {
+        height: 200px;
+        margin: 15px 0;
+        border-radius: 8px;
+    }
+
+    .post-markdown-content {
+        font-size: 0.95rem;
+        line-height: 1.6;
     }
 
     .post-markdown-content h2 {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
+        margin: 20px 0 12px;
     }
 
     .post-markdown-content h3 {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
+        margin: 16px 0 10px;
+    }
+
+    .post-markdown-content pre {
+        padding: 14px;
+        margin: 14px 0;
+        font-size: 0.85rem;
     }
 
     .post-detail-pagination {
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
+        margin-top: 30px;
+        padding-top: 20px;
     }
 
     .post-nav-btn {
         width: 100%;
+        padding: 12px 16px;
+        font-size: 0.9rem;
     }
 
+    .back-button {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+        display: block;
+        margin-left: auto;
+    }
+
+    /* Proyectos */
     .projects-container {
-        grid-template-columns: 1fr;
-        gap: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 16px;
+        margin-bottom: 25px;
+    }
+
+    .project-card {
+        border-radius: 10px;
     }
 
     .project-thumbnail {
@@ -1122,15 +1347,297 @@ body {
     }
 
     .project-content {
-        padding: 16px;
+        padding: 14px;
     }
 
     .project-title {
-        font-size: 1.1rem;
+        font-size: 1rem;
+        margin-bottom: 6px;
+    }
+
+    .project-category-badge {
+        font-size: 0.7rem;
+        padding: 3px 8px;
     }
 
     .project-description {
         font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 10px;
+    }
+
+    .project-technologies {
+        gap: 6px;
+        margin-bottom: 10px;
+    }
+
+    .tech-tag {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+    }
+
+    .project-footer {
+        font-size: 0.8rem;
+        padding-top: 8px;
+    }
+
+    .empty-state {
+        padding: 40px 20px;
+    }
+
+    .empty-state-icon {
+        font-size: 2.5rem;
+    }
+
+    .empty-state-title {
+        font-size: 1.1rem;
+    }
+
+    .empty-state-message {
+        font-size: 0.9rem;
+    }
+
+    /* About */
+    .about-content {
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .about-content p {
+        font-size: 0.95rem;
+        line-height: 1.7;
+    }
+}
+
+/* ========================================
+   RESPONSIVE - MÓVILES PEQUEÑOS (480px y menos)
+   ======================================== */
+@media (max-width: 480px) {
+    .hamburger-menu {
+        width: 40px;
+        height: 40px;
+        top: 16px;
+        left: 16px;
+        gap: 5px;
+    }
+
+    .hamburger-menu span {
+        width: 20px;
+        height: 2px;
+    }
+
+    .sidebar {
+        left: -100%;
+        width: 75vw;
+        max-width: 280px;
+        padding: 50px 16px 20px;
+    }
+
+    .profile-section {
+        margin-bottom: 30px;
+    }
+
+    .profile-photo {
+        width: 80px;
+        height: 80px;
+    }
+
+    .profile-name {
+        font-size: 1.2rem;
+    }
+
+    .menu-link {
+        padding: 12px 14px;
+        font-size: 0.95rem;
+    }
+
+    .menu-icon {
+        font-size: 1.1rem;
+        margin-right: 10px;
+    }
+
+    .social-links {
+        gap: 10px;
+    }
+
+    .social-links a {
+        width: 36px;
+        height: 36px;
+        font-size: 0.7rem;
+    }
+
+    .main-content {
+        padding: 16px;
+    }
+
+    .section-title {
+        font-size: 1.2rem;
+    }
+
+    .section-header {
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .search-container {
+        width: 100%;
+    }
+
+    .search-input {
+        padding: 8px 12px 8px 32px;
+        font-size: 0.85rem;
+        border-radius: 6px;
+    }
+
+    .search-icon {
+        width: 14px;
+        height: 14px;
+        left: 10px;
+    }
+
+    .post-card {
+        padding: 12px;
+        gap: 10px;
+        border-radius: 10px;
+    }
+
+    .post-image {
+        height: 140px;
+    }
+
+    .post-title {
+        font-size: 1rem;
+    }
+
+    .post-description {
+        font-size: 0.85rem;
+        line-height: 1.5;
+        -webkit-line-clamp: 2;
+    }
+
+    .post-meta {
+        font-size: 0.75rem;
+        gap: 8px;
+    }
+
+    .post-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .modern-pagination {
+        gap: 6px;
+        margin-top: 25px;
+        padding-top: 15px;
+    }
+
+    .pagination-arrow {
+        width: 32px;
+        height: 32px;
+    }
+
+    .pagination-numbers {
+        gap: 3px;
+    }
+
+    .page-number {
+        min-width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+
+    .post-title-detail {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+    }
+
+    .post-featured-image {
+        height: 160px;
+        margin: 12px 0;
+    }
+
+    .post-markdown-content {
+        font-size: 0.9rem;
+    }
+
+    .post-markdown-content h2 {
+        font-size: 1.15rem;
+        margin: 16px 0 10px;
+    }
+
+    .post-markdown-content h3 {
+        font-size: 1rem;
+        margin: 12px 0 8px;
+    }
+
+    .post-markdown-content pre {
+        padding: 12px;
+        font-size: 0.8rem;
+    }
+
+    .post-detail-pagination {
+        gap: 8px;
+        margin-top: 25px;
+        padding-top: 15px;
+    }
+
+    .post-nav-btn {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+
+    .back-button {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+    }
+
+    .projects-container {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .project-thumbnail {
+        height: 140px;
+    }
+
+    .project-content {
+        padding: 12px;
+    }
+
+    .project-title {
+        font-size: 0.95rem;
+    }
+
+    .project-description {
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+    }
+
+    .tech-tag {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+    }
+
+    .empty-state {
+        padding: 30px 16px;
+    }
+
+    .empty-state-icon {
+        font-size: 2rem;
+        margin-bottom: 16px;
+    }
+
+    .empty-state-title {
+        font-size: 1rem;
+    }
+
+    .about-content {
+        padding: 16px;
+    }
+
+    .about-content p {
+        font-size: 0.9rem;
+        line-height: 1.6;
     }
 }
 
