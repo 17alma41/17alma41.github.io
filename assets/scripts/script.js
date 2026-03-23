@@ -25,7 +25,7 @@ class PostsManager {
             await this.loadMarkedIfNeeded();
             
             // Cargar datos de posts
-            const response = await fetch('./data/posts-data.json');
+            const response = await fetch('../content/data/posts-data.json');
             const data = await response.json();
             
             this.posts = data.posts;
@@ -546,7 +546,7 @@ class ProjectsManager {
     async init() {
         try {
             // Cargar datos de proyectos
-            const response = await fetch('./data/projects-data.json');
+            const response = await fetch('../content/data/projects-data.json');
             const data = await response.json();
             
             this.projects = data.projects;

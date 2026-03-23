@@ -6,7 +6,7 @@
  * Este script lee archivos Markdown de la carpeta `posts/` y genera un archivo JSON
  * con metadatos de los posts para ser consumido por el frontend.
  * 
- * Uso: node scripts/generate-posts.js
+ * Uso: node assets/scripts/generate-posts.js
  */
 
 const fs = require('fs');
@@ -14,8 +14,8 @@ const path = require('path');
 const yaml = require('js-yaml');
 
 // Configuración
-const POSTS_DIR = path.join(__dirname, '../posts');
-const OUTPUT_FILE = path.join(__dirname, '../data/posts-data.json');
+const POSTS_DIR = path.join(__dirname, '../content/posts');
+const OUTPUT_FILE = path.join(__dirname, '../content/data/posts-data.json');
 
 // Crear directorio de salida si no existe
 const dataDir = path.dirname(OUTPUT_FILE);
