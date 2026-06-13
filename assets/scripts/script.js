@@ -32,8 +32,12 @@ class PostsManager {
             this.filteredPosts = [...this.posts];
             
             this.setupEventListeners();
+            this.setupHistoryHandling();
             this.displayPosts();
             this.setupMenuNavigation();
+            
+            // Manejar URL inicial (si hay hash)
+            this.handleInitialUrl();
         } catch (error) {
             console.error('Error inicializando posts:', error);
             this.showError('No se pudieron cargar los posts');
@@ -57,6 +61,84 @@ class PostsManager {
                 }
             }, 100);
         });
+    }
+
+    /**
+     * Configura el manejo del historial del navegador (botones atrás/adelante)
+     */
+    setupHistoryHandling() {
+        // Escuchar eventos del botón atrás/adelante
+        window.addEventListener('popstate', (e) => {
+            const pathname = window.location.pathname;
+            this.navigateToPath(pathname);
+        });
+    }
+
+    /**
+     * Navega a una ruta específica basándose en el pathname
+     */
+    navigateToPath(pathname) {
+        // Limpiar la ruta - remover trailing slashes, repo name y convertir a minúsculas
+        let path = pathname.toLowerCase().replace(/\/$/, '').replace(/\/index\.html/, '');
+        
+        // Remover repo name si existe (para GitHub Pages)
+        path = path.replace(/^\/17alma41\.github\.io/, '');
+        
+        // Asegurar que comienza con /
+        if (path === '' || path === '/') {
+            // Home
+            this.showSection('home-section');
+            this.showListView();
+            this.scrollToSection();
+            return;
+        }
+        
+        // Detectar si es un post (ej: /post/123)
+        if (path.startsWith('/post/')) {
+            const postId = path.replace('/post/', '').replace(/\/$/, '');
+            if (postId) {
+                this.showSection('home-section');
+                this.openPost(postId);
+                return;
+            }
+        }
+        
+        // Detectar projects
+        if (path === '/projects') {
+            this.showSection('projects-section');
+            return;
+        }
+        
+        // Detectar about
+        if (path === '/about') {
+            this.showSection('about-section');
+            return;
+        }
+        
+        // Por defecto: home
+        this.showSection('home-section');
+        this.showListView();
+        this.scrollToSection();
+    }
+
+    /**
+     * Maneja la URL inicial cuando se carga la página
+     */
+    handleInitialUrl() {
+        // Verificar si hay un redirect desde 404.html
+        const params = new URLSearchParams(window.location.search);
+        const redirectPath = params.get('redirect');
+        
+        let pathname = window.location.pathname;
+        
+        // Si hay redirect, usar esa ruta
+        if (redirectPath) {
+            pathname = decodeURIComponent(redirectPath);
+            // Limpiar la URL de los parámetros de redirect
+            window.history.replaceState(null, '', pathname);
+        }
+        
+        this.navigateToPath(pathname);
     }
     
     /**
@@ -324,6 +406,9 @@ class PostsManager {
         const post = this.filteredPosts[postIndex];
         this.currentPostIndex = postIndex;
         
+        // Actualizar la URL en el historial (sin hash)
+        window.history.pushState({ postId }, `${post.title}`, `/post/${postId}`);
+        
         // Mostrar vista de detalle
         this.displayPostDetail(post);
         this.updatePostNavigation();
@@ -394,11 +479,16 @@ class PostsManager {
         if (this.currentPostIndex > 0) {
             this.currentPostIndex--;
             const post = this.filteredPosts[this.currentPostIndex];
+            
+            // Actualizar la URL en el historial
+            window.history.pushState({ postId: post.id, view: 'detail' }, `${post.title}`, `/post/${post.id}`);
+            
             this.displayPostDetail(post);
             this.updatePostNavigation();
+            this.scrollToSection();
         }
     }
-    
+
     /**
      * Va al post siguiente
      */
@@ -406,15 +496,23 @@ class PostsManager {
         if (this.currentPostIndex < this.filteredPosts.length - 1) {
             this.currentPostIndex++;
             const post = this.filteredPosts[this.currentPostIndex];
+            
+            // Actualizar la URL en el historial
+            window.history.pushState({ postId: post.id, view: 'detail' }, `${post.title}`, `/post/${post.id}`);
+            
             this.displayPostDetail(post);
             this.updatePostNavigation();
+            this.scrollToSection();
         }
     }
-    
+
     /**
      * Vuelve a la lista de posts
      */
     backToPostsList() {
+        // Actualizar la URL en el historial
+        window.history.pushState({ view: 'list' }, 'Home', '/');
+        
         this.showListView();
         this.scrollToSection();
     }
@@ -491,15 +589,19 @@ class PostsManager {
         
         menuLinks.forEach(link => {
             link.addEventListener('click', (e) => {
+                e.preventDefault();
                 const href = link.getAttribute('href');
                 
-                // Mapeo de links a secciones
-                if (href === '#home') {
+                // Mapeo de links a rutas
+                if (href === '/') {
+                    window.history.pushState({ view: 'list' }, 'Home', '/');
                     this.showSection('home-section');
-                    this.showListView(); // Volver a vista de lista al hacer click en Home
-                } else if (href === '#projects') {
+                    this.showListView();
+                } else if (href === '/projects') {
+                    window.history.pushState({ view: 'projects' }, 'Projects', '/projects');
                     this.showSection('projects-section');
-                } else if (href === '#about') {
+                } else if (href === '/about') {
+                    window.history.pushState({ view: 'about' }, 'About', '/about');
                     this.showSection('about-section');
                 }
             });
@@ -653,6 +755,7 @@ class ProjectsManager {
             this.currentPage = pageNum;
             this.displayProjects();
             this.updatePaginationUI();
+            this.scrollToSection();
         }
     }
     
@@ -664,6 +767,7 @@ class ProjectsManager {
             this.currentPage--;
             this.displayProjects();
             this.updatePaginationUI();
+            this.scrollToSection();
         }
     }
     
@@ -676,6 +780,23 @@ class ProjectsManager {
             this.currentPage++;
             this.displayProjects();
             this.updatePaginationUI();
+            this.scrollToSection();
+        }
+    }
+
+      /**
+     * Scroll suave a la sección de posts
+     */
+    scrollToSection() {
+        const section = document.getElementById('projects-section');
+        if (section) {
+            // Dar un pequeño delay para asegurar que el DOM esté actualizado
+            setTimeout(() => {
+                section.parentElement.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }, 100);
         }
     }
     
@@ -844,6 +965,7 @@ class ProjectsManager {
 class MobileMenuManager {
     constructor() {
         this.hamburgerBtn = document.getElementById('hamburger-btn');
+        this.hamburgerCheckbox = document.getElementById('hamburger-checkbox');
         this.sidebar = document.getElementById('sidebar');
         this.menuLinks = document.querySelectorAll('.menu-link');
         
@@ -854,9 +976,10 @@ class MobileMenuManager {
      * Inicializa el manejador del menú móvil
      */
     init() {
-        if (this.hamburgerBtn && this.sidebar) {
-            // Click en el botón hamburguesa
-            this.hamburgerBtn.addEventListener('click', () => this.toggleMenu());
+        if (this.hamburgerBtn && this.sidebar && this.hamburgerCheckbox) {
+            
+            // Escuchamos el cambio de estado del checkbox (gatillado por click en el label)
+            this.hamburgerCheckbox.addEventListener('change', () => this.handleCheckboxChange());
             
             // Click en los links del menú para cerrar
             this.menuLinks.forEach(link => {
@@ -876,40 +999,37 @@ class MobileMenuManager {
     }
 
     /**
-     * Abre/cierra el menú hamburguesa
+     * Sincroniza el estado del sidebar y el scroll según el estado del checkbox animado
      */
-    toggleMenu() {
-        this.hamburgerBtn.classList.toggle('active');
-        this.sidebar.classList.toggle('active');
-        
-        // Prevenir scroll del body cuando el menú está abierto
-        if (this.sidebar.classList.contains('active')) {
+    handleCheckboxChange() {
+        if (this.hamburgerCheckbox.checked) {
+            this.sidebar.classList.add('active');
             document.body.style.overflow = 'hidden';
         } else {
+            this.sidebar.classList.remove('active');
             document.body.style.overflow = '';
         }
     }
 
     /**
-     * Cierra el menú
+     * Cierra el menú de forma segura reseteando el checkbox visual
      */
     closeMenu() {
-        this.hamburgerBtn.classList.remove('active');
-        this.sidebar.classList.remove('active');
-        document.body.style.overflow = '';
+        if (this.hamburgerCheckbox.checked) {
+            this.hamburgerCheckbox.checked = false;
+            this.sidebar.classList.remove('active');
+            document.body.style.overflow = '';
+        }
     }
 
     /**
      * Maneja clicks fuera del menú
      */
     handleOutsideClick(e) {
-        // Solo en móvil cuando el menú está abierto
         if (!this.sidebar.classList.contains('active')) return;
         
-        // Si hace click en el hamburguesa, no cerrar (ya se maneja en toggleMenu)
         if (this.hamburgerBtn && this.hamburgerBtn.contains(e.target)) return;
         
-        // Si hace click fuera del sidebar, cerrar
         if (!this.sidebar.contains(e.target)) {
             this.closeMenu();
         }

@@ -125,6 +125,8 @@ test-file.md
 prueba.md
 temp/
 temp-*
+QUICK_START.md
+server.js
 
 # Credenciales o información sensible (IMPORTANTE)
 .credentials
