@@ -193,6 +193,7 @@ body {
     border-radius: 12px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     border-left: 2px solid transparent;
+    
 }
 
 .menu-link:hover,

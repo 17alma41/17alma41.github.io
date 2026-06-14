@@ -1,9 +1,3 @@
-/**
- * Posts Management System - Full Version v3.0
- * 
- * Sistema completo para gestionar posts integrados en el Home
- * Con renderizado de Markdown individual y paginación moderna
- */
 
 class PostsManager {
     constructor() {
@@ -21,7 +15,6 @@ class PostsManager {
      */
     async init() {
         try {
-            // Esperar a que marked.js esté disponible
             await this.loadMarkedIfNeeded();
             
             // Cargar datos de posts
@@ -36,7 +29,6 @@ class PostsManager {
             this.displayPosts();
             this.setupMenuNavigation();
             
-            // Manejar URL inicial (si hay hash)
             this.handleInitialUrl();
         } catch (error) {
             console.error('Error inicializando posts:', error);
@@ -556,17 +548,26 @@ class PostsManager {
     }
     
     /**
-     * Scroll suave a la sección de posts
-     */
+   * Scroll suave a la sección de posts (Compatible con móvil y escritorio)
+   */
     scrollToSection() {
         const section = document.getElementById('home-section');
         if (section) {
-            // Dar un pequeño delay para asegurar que el DOM esté actualizado
             setTimeout(() => {
-                section.parentElement.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
+                // (menos de 768px)
+                if (window.innerWidth <= 768) {
+                    section.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                } else {
+                    if (section.parentElement) {
+                        section.parentElement.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
             }, 100);
         }
     }
@@ -597,12 +598,21 @@ class PostsManager {
                     window.history.pushState({ view: 'list' }, 'Home', '/');
                     this.showSection('home-section');
                     this.showListView();
+                    this.scrollToSection();
                 } else if (href === '/projects') {
                     window.history.pushState({ view: 'projects' }, 'Projects', '/projects');
                     this.showSection('projects-section');
+                    document.getElementById('projects-section').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
                 } else if (href === '/about') {
                     window.history.pushState({ view: 'about' }, 'About', '/about');
                     this.showSection('about-section');
+                    document.getElementById('about-section').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
                 }
             });
         });
@@ -628,10 +638,6 @@ class PostsManager {
     }
 }
 
-/**
- * Projects Management System
- * Sistema completo para gestionar proyectos dinámicamente
- */
 class ProjectsManager {
     constructor() {
         this.projects = [];
@@ -784,18 +790,27 @@ class ProjectsManager {
         }
     }
 
-      /**
-     * Scroll suave a la sección de posts
-     */
+    /**
+    * Scroll suave a la sección de posts
+    */
     scrollToSection() {
         const section = document.getElementById('projects-section');
         if (section) {
-            // Dar un pequeño delay para asegurar que el DOM esté actualizado
             setTimeout(() => {
-                section.parentElement.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
+                // (menos de 768px)
+                if (window.innerWidth <= 768) {
+                    section.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                } else {
+                    if (section.parentElement) {
+                        section.parentElement.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
             }, 100);
         }
     }
