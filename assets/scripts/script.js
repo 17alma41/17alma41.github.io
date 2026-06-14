@@ -262,7 +262,7 @@ class PostsManager {
             const isSearching = searchInput && searchInput.value.trim() !== '';
             
             const emptyMessage = isSearching 
-                ? 'No posts encontrados con esa búsqueda'
+                ? 'Ningún posts encontrados con esa búsqueda'
                 : 'No hay posts disponibles';
             
             const emptyIcon = isSearching ? '🔍' : '📝';
@@ -289,6 +289,7 @@ class PostsManager {
         
         // Actualizar paginación moderna
         this.updateModernPagination(totalPages);
+        
     }
     
     /**
@@ -526,6 +527,12 @@ class PostsManager {
                 listView.classList.remove('hidden');
             }
         }, 50);
+
+        // Mostrar el botón de tema si estamos en la lista
+        const themeBtn = document.getElementById('theme-toggle-container');
+        if (themeBtn) {
+            themeBtn.classList.remove('hidden');
+        }
     }
     
     /**
@@ -545,6 +552,12 @@ class PostsManager {
                 detailView.classList.remove('hidden');
             }
         }, 50);
+
+        // Ocultar el botón de tema si estamos en un post
+        const themeBtn = document.getElementById('theme-toggle-container');
+        if (themeBtn) {
+            themeBtn.classList.add('hidden');
+        }
     }
     
     /**
@@ -634,6 +647,18 @@ class PostsManager {
         const section = document.getElementById(sectionId);
         if (section) {
             section.classList.remove('hidden');
+        }
+
+        // Manejar visibilidad del botón de tema según la sección
+        const themeBtn = document.getElementById('theme-toggle-container');
+        if (themeBtn) {
+            if (sectionId === 'post-detail-view') {
+                // Si entra a un post, lo ocultamos
+                themeBtn.classList.add('hidden');
+            } else {
+                // Si entra a Home, Projects, About lo mostramos 
+                themeBtn.classList.remove('hidden');
+            }
         }
     }
 }
@@ -896,7 +921,7 @@ class ProjectsManager {
             const isSearching = searchInput && searchInput.value.trim() !== '';
             
             const emptyMessage = isSearching 
-                ? 'No projects encontrados con esa búsqueda'
+                ? 'Ningún proyecto encontrado con esa búsqueda'
                 : 'No hay proyectos disponibles';
             
             const emptyIcon = isSearching ? '🔍' : '💼';
@@ -973,10 +998,6 @@ class ProjectsManager {
     }
 }
 
-/**
- * Mobile Menu Manager - Menú Hamburguesa para móviles
- * Gestiona la apertura y cierre del menú lateral en dispositivos móviles
- */
 class MobileMenuManager {
     constructor() {
         this.hamburgerBtn = document.getElementById('hamburger-btn');
@@ -1051,9 +1072,66 @@ class MobileMenuManager {
     }
 }
 
-// Inicializar cuando el DOM esté listo
+class ThemeManager {
+    constructor() {
+        this.themeToggleInput = document.getElementById('themeToggle');
+        this.init();
+    }
+
+    init() {
+        if (!this.themeToggleInput) return;
+
+        // Miramos si hay algo guardado localmente y qué pide el sistema
+        const savedTheme = localStorage.getItem('portfolio-theme');
+        const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+
+        if (savedTheme === 'light') {
+            this.enableLightMode(true);
+        } else if (savedTheme === 'dark') {
+            this.enableDarkMode(true);
+        } else if (systemPrefersLight) {
+            // Si es su primera vez y su dispositivo está en modo claro
+            this.enableLightMode(false); 
+        } else {
+            // Si es su primera vez y su dispositivo está en oscuro
+            this.enableDarkMode(false);
+        }
+
+        this.themeToggleInput.addEventListener('change', () => {
+            if (this.themeToggleInput.checked) {
+                this.enableLightMode(true);
+            } else {
+                this.enableDarkMode(true);
+            }
+        });
+    }
+
+    /**
+     * Activa el modo claro 
+     */
+    enableLightMode(savePreference) {
+        document.body.classList.add('light-mode');
+        this.themeToggleInput.checked = true; // Sol
+        if (savePreference) {
+            localStorage.setItem('portfolio-theme', 'light');
+        }
+    }
+
+    /**
+     * Activa el modo oscuro 
+     */
+    enableDarkMode(savePreference) {
+        document.body.classList.remove('light-mode');
+        this.themeToggleInput.checked = false; // Luna
+        if (savePreference) {
+            localStorage.setItem('portfolio-theme', 'dark');
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     new PostsManager();
     new ProjectsManager();
     new MobileMenuManager();
+    new ThemeManager();
 });
