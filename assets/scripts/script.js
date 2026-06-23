@@ -1,4 +1,3 @@
-
 class PostsManager {
     constructor() {
         this.posts = [];
@@ -10,35 +9,38 @@ class PostsManager {
         this.init();
     }
     
-    /**
-     * Inicializa el sistema
-     */
     async init() {
+        this.setupEventListeners();
+        this.setupHistoryHandling();
+        this.setupMenuNavigation();
+        
         try {
             await this.loadMarkedIfNeeded();
             
-            // Cargar datos de posts
-            const response = await fetch('../content/data/posts-data.json');
+            const response = await fetch('content/data/posts-data.json');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const data = await response.json();
             
+            // Guardamos los datos en memoria
             this.posts = data.posts;
             this.filteredPosts = [...this.posts];
             
-            this.setupEventListeners();
-            this.setupHistoryHandling();
+            // Renderizamos las tarjetas
             this.displayPosts();
-            this.setupMenuNavigation();
             
+            // Leemos la URL AHORA que ya tenemos los datos
             this.handleInitialUrl();
+            
         } catch (error) {
             console.error('Error inicializando posts:', error);
-            this.showError('No se pudieron cargar los posts');
+            this.showError('No se pudieron cargar los posts. Asegúrate de estar usando un servidor local (ej: Live Server) y no el protocolo file://');
         }
     }
     
-    /**
-     * Espera a que marked.js esté disponible
-     */
     async loadMarkedIfNeeded() {
         let attempts = 0;
         return new Promise((resolve) => {
@@ -55,39 +57,27 @@ class PostsManager {
         });
     }
 
-    /**
-     * Configura el manejo del historial del navegador (botones atrás/adelante)
-     */
     setupHistoryHandling() {
-        // Escuchar eventos del botón atrás/adelante
-        window.addEventListener('popstate', (e) => {
-            const pathname = window.location.pathname;
-            this.navigateToPath(pathname);
+        window.addEventListener('hashchange', () => {
+            this.handleHashRoute();
         });
     }
 
-    /**
-     * Navega a una ruta específica basándose en el pathname
-     */
-    navigateToPath(pathname) {
-        // Limpiar la ruta - remover trailing slashes, repo name y convertir a minúsculas
-        let path = pathname.toLowerCase().replace(/\/$/, '').replace(/\/index\.html/, '');
+    handleHashRoute() {
+        const hash = window.location.hash || '#/';
         
-        // Remover repo name si existe (para GitHub Pages)
-        path = path.replace(/^\/17alma41\.github\.io/, '');
+        let route = hash.replace(/^#/, '').toLowerCase();
+        if (route === '') route = '/';
         
-        // Asegurar que comienza con /
-        if (path === '' || path === '/') {
-            // Home
+        if (route === '/' || route === '/home') {
             this.showSection('home-section');
             this.showListView();
-            this.scrollToSection();
+            this.scrollToSection('home-section');
             return;
         }
         
-        // Detectar si es un post (ej: /post/123)
-        if (path.startsWith('/post/')) {
-            const postId = path.replace('/post/', '').replace(/\/$/, '');
+        if (route.startsWith('/post/')) {
+            const postId = route.replace('/post/', '').replace(/\/$/, '');
             if (postId) {
                 this.showSection('home-section');
                 this.openPost(postId);
@@ -95,92 +85,37 @@ class PostsManager {
             }
         }
         
-        // Detectar projects
-        if (path === '/projects') {
+        if (route === '/projects') {
             this.showSection('projects-section');
+            this.scrollToSection('projects-section');
             return;
         }
         
-        // Detectar about
-        if (path === '/about') {
+        if (route === '/about') {
             this.showSection('about-section');
+            this.scrollToSection('about-section');
             return;
         }
         
-        // Por defecto: home
         this.showSection('home-section');
         this.showListView();
-        this.scrollToSection();
+        this.scrollToSection('home-section');
     }
 
-    /**
-     * Maneja la URL inicial cuando se carga la página
-     */
     handleInitialUrl() {
-        // Verificar si hay un redirect desde 404.html
-        const params = new URLSearchParams(window.location.search);
-        const redirectPath = params.get('redirect');
-        
-        let pathname = window.location.pathname;
-        
-        // Si hay redirect, usar esa ruta
-        if (redirectPath) {
-            pathname = decodeURIComponent(redirectPath);
-            // Limpiar la URL de los parámetros de redirect
-            window.history.replaceState(null, '', pathname);
-        }
-        
-        this.navigateToPath(pathname);
+        this.handleHashRoute();
     }
     
-    /**
-     * Configura los event listeners de paginación y navegación
-     */
-    setupEventListeners() {
-        // Paginación de lista
-        const prevPaginationBtn = document.getElementById('prev-pagination-btn');
-        const nextPaginationBtn = document.getElementById('next-pagination-btn');
-        
-        if (prevPaginationBtn) prevPaginationBtn.addEventListener('click', () => this.previousPage());
-        if (nextPaginationBtn) nextPaginationBtn.addEventListener('click', () => this.nextPage());
-        
-        // Botón de volver desde post detalle
-        const backBtn = document.getElementById('back-to-posts-btn');
-        if (backBtn) backBtn.addEventListener('click', () => this.backToPostsList());
-        
-        // Navegación entre posts detalle
-        const postPrevBtn = document.getElementById('post-prev-btn');
-        const postNextBtn = document.getElementById('post-next-btn');
-        
-        if (postPrevBtn) postPrevBtn.addEventListener('click', () => this.previousPost());
-        if (postNextBtn) postNextBtn.addEventListener('click', () => this.nextPost());
-        
-        // Búsqueda de posts
-        const searchInput = document.getElementById('search-input');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
-        }
-    }
-    
-    /**
-     * Obtiene los posts de la página actual
-     */
     getPaginatedPosts() {
         const start = (this.currentPage - 1) * this.postsPerPage;
         const end = start + this.postsPerPage;
         return this.filteredPosts.slice(start, end);
     }
     
-    /**
-     * Obtiene el número total de páginas
-     */
     getTotalPages() {
         return Math.ceil(this.filteredPosts.length / this.postsPerPage);
     }
     
-    /**
-     * Crea el HTML de una tarjeta de post
-     */
     createPostCard(post) {
         const date = new Date(post.date).toLocaleDateString('es-ES', {
             year: 'numeric',
@@ -188,9 +123,11 @@ class PostsManager {
             day: 'numeric'
         });
         
+        const cleanImage = post.image.startsWith('../') ? post.image.replace('../', '') : post.image;
+        
         return `
             <article class="post-card" data-post-id="${post.id}">
-                <img src="${post.image}" alt="${post.title}" class="post-image" loading="lazy">
+                <img src="${cleanImage}" alt="${post.title}" class="post-image" loading="lazy">
                 <div class="post-content">
                     <div class="post-header">
                         <h3 class="post-title">${this.escapeHtml(post.title)}</h3>
@@ -204,51 +141,33 @@ class PostsManager {
         `;
     }
     
-    /**
-     * Escapa caracteres HTML para prevenir XSS
-     */
     escapeHtml(text) {
         const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
         };
         return text.replace(/[&<>"']/g, m => map[m]);
     }
     
-    /**
-     * Maneja la búsqueda de posts
-     */
     handleSearch(searchTerm) {
         const trimmedTerm = searchTerm.trim().toLowerCase();
         
         if (trimmedTerm === '') {
-            // Si vacío, mostrar todos los posts
             this.filteredPosts = [...this.posts];
         } else {
-            // Filtrar posts por título, descripción o categoría
             this.filteredPosts = this.posts.filter(post => {
                 const searchableText = `
                     ${post.title.toLowerCase()} 
                     ${post.description.toLowerCase()} 
                     ${post.category ? post.category.toLowerCase() : ''}
                 `.toLowerCase();
-                
                 return searchableText.includes(trimmedTerm);
             });
         }
         
-        // Resetear a la primera página cuando se busca
         this.currentPage = 1;
-        
-        // Redisplayar los posts con los resultados de búsqueda
         this.displayPosts();
     }
-    /**
-     * Muestra los posts de la página actual (vista de lista)
-     */
+
     displayPosts() {
         const container = document.getElementById('posts-container');
         if (!container) return;
@@ -256,7 +175,6 @@ class PostsManager {
         const posts = this.getPaginatedPosts();
         const totalPages = this.getTotalPages();
         
-        // Si no hay posts
         if (posts.length === 0) {
             const searchInput = document.getElementById('search-input');
             const isSearching = searchInput && searchInput.value.trim() !== '';
@@ -272,29 +190,23 @@ class PostsManager {
                     <div class="empty-state-icon">${emptyIcon}</div>
                     <h3 class="empty-state-title">${emptyMessage}</h3>
                     <p class="empty-state-message">
-                        ${isSearching 
-                            ? 'Intenta con palabras clave diferentes' 
-                            : 'Todavía no hay posts para mostrar'}
+                        ${isSearching ? 'Intenta con palabras clave diferentes' : 'Todavía no hay posts para mostrar'}
                     </p>
                 </div>
             `;
         } else {
             container.innerHTML = posts.map(post => this.createPostCard(post)).join('');
             
-            // Agregar event listeners a las tarjetas
             document.querySelectorAll('.post-card').forEach(card => {
-                card.addEventListener('click', () => this.openPost(card.dataset.postId));
+                card.addEventListener('click', () => {
+                    window.location.hash = `/post/${card.dataset.postId}`;
+                });
             });
         }
         
-        // Actualizar paginación moderna
         this.updateModernPagination(totalPages);
-        
     }
     
-    /**
-     * Actualiza la paginación moderna (números + flechas)
-     */
     updateModernPagination(totalPages) {
         const prevBtn = document.getElementById('prev-pagination-btn');
         const nextBtn = document.getElementById('next-pagination-btn');
@@ -302,14 +214,11 @@ class PostsManager {
         
         if (!numbersContainer) return;
         
-        // Actualizar estado de botones de flecha
         if (prevBtn) prevBtn.disabled = this.currentPage === 1;
         if (nextBtn) nextBtn.disabled = this.currentPage === totalPages || totalPages === 0;
         
-        // Generar números de página
         numbersContainer.innerHTML = this.generatePageNumbers(this.currentPage, totalPages);
         
-        // Agregar event listeners a los números
         document.querySelectorAll('.page-number').forEach(btn => {
             btn.addEventListener('click', () => {
                 const pageNum = parseInt(btn.dataset.page);
@@ -318,36 +227,29 @@ class PostsManager {
         });
     }
     
-    /**
-     * Genera HTML para los números de página con puntos suspensivos
-     */
     generatePageNumbers(currentPage, totalPages) {
         if (totalPages <= 1) return '';
         
         let html = '';
-        const maxVisible = 5; // Máximo número de páginas visibles
+        const maxVisible = 5; 
         const halfVisible = Math.floor(maxVisible / 2);
         
         let startPage = Math.max(1, currentPage - halfVisible);
         let endPage = Math.min(totalPages, startPage + maxVisible - 1);
         
-        // Ajustar si estamos cerca del final
         if (endPage - startPage + 1 < maxVisible) {
             startPage = Math.max(1, endPage - maxVisible + 1);
         }
         
-        // Puntos suspensivos al inicio
         if (startPage > 1) {
             html += '<span class="page-ellipsis">...</span>';
         }
         
-        // Números
         for (let i = startPage; i <= endPage; i++) {
             const isActive = i === currentPage ? 'active' : '';
             html += `<button class="page-number ${isActive}" data-page="${i}">${i}</button>`;
         }
         
-        // Puntos suspensivos al final
         if (endPage < totalPages) {
             html += '<span class="page-ellipsis">...</span>';
         }
@@ -355,9 +257,6 @@ class PostsManager {
         return html;
     }
     
-    /**
-     * Va a una página específica
-     */
     goToPage(pageNum) {
         if (pageNum >= 1 && pageNum <= this.getTotalPages()) {
             this.currentPage = pageNum;
@@ -366,9 +265,6 @@ class PostsManager {
         }
     }
     
-    /**
-     * Va a la página anterior
-     */
     previousPage() {
         if (this.currentPage > 1) {
             this.currentPage--;
@@ -377,9 +273,6 @@ class PostsManager {
         }
     }
     
-    /**
-     * Va a la página siguiente
-     */
     nextPage() {
         const totalPages = this.getTotalPages();
         if (this.currentPage < totalPages) {
@@ -389,9 +282,6 @@ class PostsManager {
         }
     }
     
-    /**
-     * Abre un post individual
-     */
     openPost(postId) {
         const postIndex = this.filteredPosts.findIndex(p => p.id === postId);
         if (postIndex === -1) return;
@@ -399,17 +289,10 @@ class PostsManager {
         const post = this.filteredPosts[postIndex];
         this.currentPostIndex = postIndex;
         
-        // Actualizar la URL en el historial (sin hash)
-        window.history.pushState({ postId }, `${post.title}`, `/post/${postId}`);
-        
-        // Mostrar vista de detalle
         this.displayPostDetail(post);
         this.updatePostNavigation();
     }
     
-    /**
-     * Muestra el detalle de un post con Markdown renderizado
-     */
     displayPostDetail(post) {
         const titleEl = document.querySelector('.post-title-detail');
         const dateEl = document.querySelector('.post-date-detail');
@@ -417,187 +300,133 @@ class PostsManager {
         const imageEl = document.getElementById('post-featured-image');
         const contentEl = document.getElementById('post-content');
         
-        // Rellenar datos
         titleEl.textContent = post.title;
         dateEl.textContent = new Date(post.date).toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
+            year: 'numeric', month: 'long', day: 'numeric'
         });
         categoryEl.textContent = post.category;
-        imageEl.src = post.image;
-        imageEl.alt = post.title;
         
-        // Renderizar Markdown a HTML
+        const cleanImage = post.image.startsWith('../') ? post.image.replace('../', '') : post.image;
+        imageEl.src = cleanImage;
+        imageEl.alt = post.title;
+
         let htmlContent = '';
         if (typeof marked !== 'undefined') {
-            // Configurar marked para mejor renderizado
-            marked.setOptions({
+            htmlContent = marked.parse(post.content, {
                 breaks: true,
                 gfm: true
             });
-            htmlContent = marked.parse(post.content);
         } else {
-            // Fallback: mostrar contenido sin procesar
             htmlContent = `<p>${this.escapeHtml(post.content).replace(/\n/g, '<br>')}</p>`;
         }
         
         contentEl.innerHTML = htmlContent;
         
-        // Cambiar vista
         this.showDetailView();
         this.updatePostNavigation();
         this.scrollToSection();
     }
     
-    /**
-     * Actualiza estado de botones de navegación entre posts
-     */
     updatePostNavigation() {
         const prevPostBtn = document.getElementById('post-prev-btn');
         const nextPostBtn = document.getElementById('post-next-btn');
         
-        if (prevPostBtn) {
-            prevPostBtn.disabled = this.currentPostIndex === 0;
-        }
-        if (nextPostBtn) {
-            nextPostBtn.disabled = this.currentPostIndex === this.filteredPosts.length - 1;
-        }
+        if (prevPostBtn) prevPostBtn.disabled = this.currentPostIndex === 0;
+        if (nextPostBtn) nextPostBtn.disabled = this.currentPostIndex === this.filteredPosts.length - 1;
     }
     
-    /**
-     * Va al post anterior
-     */
     previousPost() {
         if (this.currentPostIndex > 0) {
             this.currentPostIndex--;
             const post = this.filteredPosts[this.currentPostIndex];
-            
-            // Actualizar la URL en el historial
-            window.history.pushState({ postId: post.id, view: 'detail' }, `${post.title}`, `/post/${post.id}`);
-            
-            this.displayPostDetail(post);
-            this.updatePostNavigation();
-            this.scrollToSection();
+            window.location.hash = `/post/${post.id}`;
         }
     }
 
-    /**
-     * Va al post siguiente
-     */
     nextPost() {
-        if (this.currentPostIndex < this.filteredPosts.length - 1) {
+       if (this.currentPostIndex < this.filteredPosts.length - 1) {
             this.currentPostIndex++;
             const post = this.filteredPosts[this.currentPostIndex];
-            
-            // Actualizar la URL en el historial
-            window.history.pushState({ postId: post.id, view: 'detail' }, `${post.title}`, `/post/${post.id}`);
-            
-            this.displayPostDetail(post);
-            this.updatePostNavigation();
-            this.scrollToSection();
+            window.location.hash = `/post/${post.id}`;
         }
     }
 
-    /**
-     * Vuelve a la lista de posts
-     */
     backToPostsList() {
-        // Actualizar la URL en el historial
-        window.history.pushState({ view: 'list' }, 'Home', '/');
-        
-        this.showListView();
-        this.scrollToSection();
+        window.location.hash = '/';
     }
     
-    /**
-     * Muestra la vista de lista con transición suave
-     */
     showListView() {
         const listView = document.getElementById('posts-list-view');
         const detailView = document.getElementById('post-detail-view');
         
-        if (detailView) {
-            detailView.classList.add('hidden');
-        }
+        if (detailView) detailView.classList.add('hidden');
         
-        // Pequeño delay para que la animación sea suave
         setTimeout(() => {
-            if (listView) {
-                listView.classList.remove('hidden');
-            }
+            if (listView) listView.classList.remove('hidden');
         }, 50);
 
-        // Mostrar el botón de tema si estamos en la lista
         const themeBtn = document.getElementById('theme-toggle-container');
-        if (themeBtn) {
-            themeBtn.classList.remove('hidden');
-        }
+        if (themeBtn) themeBtn.classList.remove('hidden');
     }
     
-    /**
-     * Muestra la vista de detalle con transición suave
-     */
     showDetailView() {
         const listView = document.getElementById('posts-list-view');
         const detailView = document.getElementById('post-detail-view');
         
-        if (listView) {
-            listView.classList.add('hidden');
-        }
+        if (listView) listView.classList.add('hidden');
         
-        // Pequeño delay para que la animación sea suave
         setTimeout(() => {
-            if (detailView) {
-                detailView.classList.remove('hidden');
-            }
+            if (detailView) detailView.classList.remove('hidden');
         }, 50);
 
-        // Ocultar el botón de tema si estamos en un post
         const themeBtn = document.getElementById('theme-toggle-container');
-        if (themeBtn) {
-            themeBtn.classList.add('hidden');
-        }
+        if (themeBtn) themeBtn.classList.add('hidden');
     }
     
-    /**
-   * Scroll suave a la sección de posts (Compatible con móvil y escritorio)
-   */
-    scrollToSection() {
-        const section = document.getElementById('home-section');
-        if (section) {
-            setTimeout(() => {
-                // (menos de 768px)
-                if (window.innerWidth <= 768) {
-                    section.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                } else {
-                    if (section.parentElement) {
-                        section.parentElement.scrollTo({
-                            top: 0,
-                            behavior: 'smooth'
-                        });
-                    }
+    scrollToSection(sectionId = 'home-section') {
+        setTimeout(() => {
+            if (window.innerWidth <= 768) {
+                // En móviles y tablets, el scroll pertenece a la ventana principal
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                // En escritorio, el scroll pertenece a la etiqueta <main>
+                const section = document.getElementById(sectionId);
+                if (section && section.parentElement) {
+                    section.parentElement.scrollTo({ top: 0, behavior: 'smooth' });
                 }
-            }, 100);
-        }
+            }
+        }, 150); // El pequeño retraso extra asegura que el menú móvil tenga tiempo de cerrarse
     }
     
-    /**
-     * Muestra mensaje de error
-     */
     showError(message) {
         const container = document.getElementById('posts-container');
         if (container) {
             container.innerHTML = `<p style="color: #e53e3e; padding: 20px; text-align: center;">${message}</p>`;
         }
     }
+
+    setupEventListeners() {
+        const prevPaginationBtn = document.getElementById('prev-pagination-btn');
+        const nextPaginationBtn = document.getElementById('next-pagination-btn');
+        
+        if (prevPaginationBtn) prevPaginationBtn.addEventListener('click', () => this.previousPage());
+        if (nextPaginationBtn) nextPaginationBtn.addEventListener('click', () => this.nextPage());
+        
+        const backBtn = document.getElementById('back-to-posts-btn');
+        if (backBtn) backBtn.addEventListener('click', () => this.backToPostsList());
+        
+        const postPrevBtn = document.getElementById('post-prev-btn');
+        const postNextBtn = document.getElementById('post-next-btn');
+        
+        if (postPrevBtn) postPrevBtn.addEventListener('click', () => this.previousPost());
+        if (postNextBtn) postNextBtn.addEventListener('click', () => this.nextPost());
+        
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
+        }
+    }
     
-    /**
-     * Configura la navegación del menú principal
-     */
     setupMenuNavigation() {
         const menuLinks = document.querySelectorAll('.menu-link');
         
@@ -606,59 +435,33 @@ class PostsManager {
                 e.preventDefault();
                 const href = link.getAttribute('href');
                 
-                // Mapeo de links a rutas
-                if (href === '/') {
-                    window.history.pushState({ view: 'list' }, 'Home', '/');
-                    this.showSection('home-section');
-                    this.showListView();
-                    this.scrollToSection();
-                } else if (href === '/projects') {
-                    window.history.pushState({ view: 'projects' }, 'Projects', '/projects');
-                    this.showSection('projects-section');
-                    document.getElementById('projects-section').scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                } else if (href === '/about') {
-                    window.history.pushState({ view: 'about' }, 'About', '/about');
-                    this.showSection('about-section');
-                    document.getElementById('about-section').scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                // Si haces clic en la sección donde ya estás, sube arriba
+                const currentHash = window.location.hash.replace(/^#/, '') || '/';
+                if (currentHash === href || (currentHash === '' && href === '/')) {
+                    if (href === '/') this.scrollToSection('home-section');
+                    else if (href === '/projects') this.scrollToSection('projects-section');
+                    else if (href === '/about') this.scrollToSection('about-section');
                 }
+                
+                if (href === '/') window.location.hash = '/';
+                else if (href === '/projects') window.location.hash = '/projects';
+                else if (href === '/about') window.location.hash = '/about';
             });
         });
-        
-        // Mostrar sección Home por defecto
-        this.showSection('home-section');
     }
     
-    /**
-     * Muestra/oculta secciones principales
-     */
     showSection(sectionId) {
-        // Ocultar todas las secciones
         document.querySelectorAll('section').forEach(section => {
             section.classList.add('hidden');
         });
         
-        // Mostrar la sección especificada
         const section = document.getElementById(sectionId);
-        if (section) {
-            section.classList.remove('hidden');
-        }
+        if (section) section.classList.remove('hidden');
 
-        // Manejar visibilidad del botón de tema según la sección
         const themeBtn = document.getElementById('theme-toggle-container');
         if (themeBtn) {
-            if (sectionId === 'post-detail-view') {
-                // Si entra a un post, lo ocultamos
-                themeBtn.classList.add('hidden');
-            } else {
-                // Si entra a Home, Projects, About lo mostramos 
-                themeBtn.classList.remove('hidden');
-            }
+            if (sectionId === 'post-detail-view') themeBtn.classList.add('hidden');
+            else themeBtn.classList.remove('hidden');
         }
     }
 }
@@ -673,57 +476,40 @@ class ProjectsManager {
         this.init();
     }
     
-    /**
-     * Inicializa el sistema de proyectos
-     */
     async init() {
+        this.setupEventListeners();
+
         try {
-            // Cargar datos de proyectos
-            const response = await fetch('../content/data/projects-data.json');
+            const response = await fetch('content/data/projects-data.json');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const data = await response.json();
             
             this.projects = data.projects;
             this.filteredProjects = [...this.projects];
             
-            this.setupEventListeners();
             this.displayProjects();
         } catch (error) {
             console.error('Error inicializando proyectos:', error);
-            this.showError('No se pudieron cargar los proyectos');
+            this.showError('No se pudieron cargar los proyectos. Recuerda abrir el proyecto mediante un servidor local.');
         }
     }
     
-    /**
-     * Configura los event listeners - SOLO UNA VEZ al inicializar
-     */
     setupEventListeners() {
-        // Búsqueda
         const searchInput = document.getElementById('projects-search-input');
         if (searchInput) {
             searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
         }
         
-        // Paginación - Botones de flecha
         const prevBtn = document.getElementById('projects-prev-pagination-btn');
         const nextBtn = document.getElementById('projects-next-pagination-btn');
         
-        if (prevBtn) {
-            prevBtn.addEventListener('click', () => {
-                if (!prevBtn.disabled) {
-                    this.previousPage();
-                }
-            });
-        }
+        if (prevBtn) prevBtn.addEventListener('click', () => { if (!prevBtn.disabled) this.previousPage(); });
+        if (nextBtn) nextBtn.addEventListener('click', () => { if (!nextBtn.disabled) this.nextPage(); });
         
-        if (nextBtn) {
-            nextBtn.addEventListener('click', () => {
-                if (!nextBtn.disabled) {
-                    this.nextPage();
-                }
-            });
-        }
-        
-        // Paginación - Números de página (delegación de eventos)
         const numbersContainer = document.getElementById('projects-pagination-numbers');
         if (numbersContainer) {
             numbersContainer.addEventListener('click', (e) => {
@@ -735,9 +521,6 @@ class ProjectsManager {
         }
     }
     
-    /**
-     * Maneja la búsqueda de proyectos
-     */
     handleSearch(searchTerm) {
         const trimmedTerm = searchTerm.trim().toLowerCase();
         
@@ -756,33 +539,22 @@ class ProjectsManager {
             });
         }
         
-        // Resetear a la primera página cuando se busca
         this.currentPage = 1;
         this.displayProjects();
     }
     
-    /**
-     * Obtiene los proyectos de la página actual
-     */
     getPaginatedProjects() {
         const start = (this.currentPage - 1) * this.projectsPerPage;
         const end = start + this.projectsPerPage;
         return this.filteredProjects.slice(start, end);
     }
     
-    /**
-     * Obtiene el número total de páginas
-     */
     getTotalPages() {
         return Math.ceil(this.filteredProjects.length / this.projectsPerPage);
     }
     
-    /**
-     * Va a una página específica
-     */
     goToPage(pageNum) {
-        const totalPages = this.getTotalPages();
-        if (pageNum >= 1 && pageNum <= totalPages) {
+        if (pageNum >= 1 && pageNum <= this.getTotalPages()) {
             this.currentPage = pageNum;
             this.displayProjects();
             this.updatePaginationUI();
@@ -790,9 +562,6 @@ class ProjectsManager {
         }
     }
     
-    /**
-     * Va a la página anterior
-     */
     previousPage() {
         if (this.currentPage > 1) {
             this.currentPage--;
@@ -802,9 +571,6 @@ class ProjectsManager {
         }
     }
     
-    /**
-     * Va a la página siguiente
-     */
     nextPage() {
         const totalPages = this.getTotalPages();
         if (this.currentPage < totalPages) {
@@ -815,34 +581,19 @@ class ProjectsManager {
         }
     }
 
-    /**
-    * Scroll suave a la sección de posts
-    */
     scrollToSection() {
-        const section = document.getElementById('projects-section');
-        if (section) {
-            setTimeout(() => {
-                // (menos de 768px)
-                if (window.innerWidth <= 768) {
-                    section.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                } else {
-                    if (section.parentElement) {
-                        section.parentElement.scrollTo({
-                            top: 0,
-                            behavior: 'smooth'
-                        });
-                    }
+        setTimeout(() => {
+            if (window.innerWidth <= 768) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                const section = document.getElementById('projects-section');
+                if (section && section.parentElement) {
+                    section.parentElement.scrollTo({ top: 0, behavior: 'smooth' });
                 }
-            }, 100);
-        }
+            }
+        }, 150);
     }
     
-    /**
-     * Actualiza la UI de paginación (estado de botones y números)
-     */
     updatePaginationUI() {
         const totalPages = this.getTotalPages();
         const prevBtn = document.getElementById('projects-prev-pagination-btn');
@@ -850,12 +601,8 @@ class ProjectsManager {
         const numbersContainer = document.getElementById('projects-pagination-numbers');
         const paginationDiv = document.getElementById('projects-pagination');
         
-        // Mostrar/ocultar paginación
-        if (paginationDiv) {
-            paginationDiv.style.display = totalPages > 1 ? 'flex' : 'none';
-        }
+        if (paginationDiv) paginationDiv.style.display = totalPages > 1 ? 'flex' : 'none';
         
-        // Actualizar estado de botones de flecha
         if (prevBtn) {
             prevBtn.disabled = this.currentPage === 1;
             prevBtn.setAttribute('aria-disabled', prevBtn.disabled);
@@ -865,15 +612,11 @@ class ProjectsManager {
             nextBtn.setAttribute('aria-disabled', nextBtn.disabled);
         }
         
-        // Regenerar números de página
         if (numbersContainer) {
             numbersContainer.innerHTML = this.generatePageNumbers(this.currentPage, totalPages);
         }
     }
     
-    /**
-     * Genera HTML para los números de página con puntos suspensivos
-     */
     generatePageNumbers(currentPage, totalPages) {
         if (totalPages <= 1) return '';
         
@@ -888,28 +631,18 @@ class ProjectsManager {
             startPage = Math.max(1, endPage - maxVisible + 1);
         }
         
-        // Puntos suspensivos al inicio
-        if (startPage > 1) {
-            html += '<span class="page-ellipsis">...</span>';
-        }
+        if (startPage > 1) html += '<span class="page-ellipsis">...</span>';
         
-        // Números de página
         for (let i = startPage; i <= endPage; i++) {
             const isActive = i === currentPage ? 'active' : '';
             html += `<button class="page-number ${isActive}" data-page="${i}" aria-label="Página ${i}">${i}</button>`;
         }
         
-        // Puntos suspensivos al final
-        if (endPage < totalPages) {
-            html += '<span class="page-ellipsis">...</span>';
-        }
+        if (endPage < totalPages) html += '<span class="page-ellipsis">...</span>';
         
         return html;
     }
     
-    /**
-     * Muestra los proyectos de la página actual
-     */
     displayProjects() {
         const container = document.getElementById('projects-container');
         if (!container) return;
@@ -920,45 +653,33 @@ class ProjectsManager {
             const searchInput = document.getElementById('projects-search-input');
             const isSearching = searchInput && searchInput.value.trim() !== '';
             
-            const emptyMessage = isSearching 
-                ? 'Ningún proyecto encontrado con esa búsqueda'
-                : 'No hay proyectos disponibles';
-            
+            const emptyMessage = isSearching ? 'Ningún proyecto encontrado con esa búsqueda' : 'No hay proyectos disponibles';
             const emptyIcon = isSearching ? '🔍' : '💼';
             
             container.innerHTML = `
                 <div class="empty-state" style="grid-column: 1 / -1;">
                     <div class="empty-state-icon">${emptyIcon}</div>
                     <h3 class="empty-state-title">${emptyMessage}</h3>
-                    <p class="empty-state-message">
-                        ${isSearching 
-                            ? 'Intenta con palabras clave diferentes' 
-                            : 'Todavía no hay proyectos para mostrar'}
-                    </p>
+                    <p class="empty-state-message">${isSearching ? 'Intenta con palabras clave diferentes' : 'Todavía no hay proyectos para mostrar'}</p>
                 </div>
             `;
         } else {
             container.innerHTML = paginatedProjects.map(project => this.createProjectCard(project)).join('');
         }
         
-        // Actualizar UI de paginación
         this.updatePaginationUI();
     }
     
-    /**
-     * Crea el HTML de una tarjeta de proyecto
-     */
     createProjectCard(project) {
         const techsHtml = project.technologies && project.technologies.length > 0
-            ? project.technologies
-                .slice(0, 3)
-                .map(tech => `<span class="tech-tag">${this.escapeHtml(tech)}</span>`)
-                .join('')
+            ? project.technologies.slice(0, 3).map(tech => `<span class="tech-tag">${this.escapeHtml(tech)}</span>`).join('')
             : '';
+
+        const cleanImage = project.image.startsWith('../') ? project.image.replace('../', '') : project.image;
         
         return `
             <a href="${project.url}" target="_blank" rel="noopener" class="project-card" title="Ir a ${this.escapeHtml(project.title)}">
-                <img src="${project.image}" alt="${project.title}" class="project-thumbnail" loading="lazy">
+                <img src="${cleanImage}" alt="${project.title}" class="project-thumbnail" loading="lazy">
                 <div class="project-content">
                     ${project.category ? `<span class="project-category-badge">${this.escapeHtml(project.category)}</span>` : ''}
                     <h3 class="project-title">${this.escapeHtml(project.title)}</h3>
@@ -973,23 +694,11 @@ class ProjectsManager {
         `;
     }
     
-    /**
-     * Escapa caracteres HTML para prevenir XSS
-     */
     escapeHtml(text) {
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
         return text.replace(/[&<>"']/g, m => map[m]);
     }
     
-    /**
-     * Muestra mensaje de error
-     */
     showError(message) {
         const container = document.getElementById('projects-container');
         if (container) {
@@ -1008,35 +717,15 @@ class MobileMenuManager {
         this.init();
     }
 
-    /**
-     * Inicializa el manejador del menú móvil
-     */
     init() {
         if (this.hamburgerBtn && this.sidebar && this.hamburgerCheckbox) {
-            
-            // Escuchamos el cambio de estado del checkbox (gatillado por click en el label)
             this.hamburgerCheckbox.addEventListener('change', () => this.handleCheckboxChange());
-            
-            // Click en los links del menú para cerrar
-            this.menuLinks.forEach(link => {
-                link.addEventListener('click', () => this.closeMenu());
-            });
-            
-            // Click fuera del menú para cerrar
+            this.menuLinks.forEach(link => link.addEventListener('click', () => this.closeMenu()));
             document.addEventListener('click', (e) => this.handleOutsideClick(e));
-            
-            // Escape para cerrar
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    this.closeMenu();
-                }
-            });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.closeMenu(); });
         }
     }
 
-    /**
-     * Sincroniza el estado del sidebar y el scroll según el estado del checkbox animado
-     */
     handleCheckboxChange() {
         if (this.hamburgerCheckbox.checked) {
             this.sidebar.classList.add('active');
@@ -1047,9 +736,6 @@ class MobileMenuManager {
         }
     }
 
-    /**
-     * Cierra el menú de forma segura reseteando el checkbox visual
-     */
     closeMenu() {
         if (this.hamburgerCheckbox.checked) {
             this.hamburgerCheckbox.checked = false;
@@ -1058,17 +744,10 @@ class MobileMenuManager {
         }
     }
 
-    /**
-     * Maneja clicks fuera del menú
-     */
     handleOutsideClick(e) {
         if (!this.sidebar.classList.contains('active')) return;
-        
         if (this.hamburgerBtn && this.hamburgerBtn.contains(e.target)) return;
-        
-        if (!this.sidebar.contains(e.target)) {
-            this.closeMenu();
-        }
+        if (!this.sidebar.contains(e.target)) this.closeMenu();
     }
 }
 
@@ -1081,7 +760,6 @@ class ThemeManager {
     init() {
         if (!this.themeToggleInput) return;
 
-        // Miramos si hay algo guardado localmente y qué pide el sistema
         const savedTheme = localStorage.getItem('portfolio-theme');
         const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
 
@@ -1090,42 +768,27 @@ class ThemeManager {
         } else if (savedTheme === 'dark') {
             this.enableDarkMode(true);
         } else if (systemPrefersLight) {
-            // Si es su primera vez y su dispositivo está en modo claro
             this.enableLightMode(false); 
         } else {
-            // Si es su primera vez y su dispositivo está en oscuro
             this.enableDarkMode(false);
         }
 
         this.themeToggleInput.addEventListener('change', () => {
-            if (this.themeToggleInput.checked) {
-                this.enableLightMode(true);
-            } else {
-                this.enableDarkMode(true);
-            }
+            if (this.themeToggleInput.checked) this.enableLightMode(true);
+            else this.enableDarkMode(true);
         });
     }
 
-    /**
-     * Activa el modo claro 
-     */
     enableLightMode(savePreference) {
         document.body.classList.add('light-mode');
-        this.themeToggleInput.checked = true; // Sol
-        if (savePreference) {
-            localStorage.setItem('portfolio-theme', 'light');
-        }
+        this.themeToggleInput.checked = true; 
+        if (savePreference) localStorage.setItem('portfolio-theme', 'light');
     }
 
-    /**
-     * Activa el modo oscuro 
-     */
     enableDarkMode(savePreference) {
         document.body.classList.remove('light-mode');
-        this.themeToggleInput.checked = false; // Luna
-        if (savePreference) {
-            localStorage.setItem('portfolio-theme', 'dark');
-        }
+        this.themeToggleInput.checked = false; 
+        if (savePreference) localStorage.setItem('portfolio-theme', 'dark');
     }
 }
 
@@ -1134,4 +797,23 @@ document.addEventListener('DOMContentLoaded', () => {
     new ProjectsManager();
     new MobileMenuManager();
     new ThemeManager();
+});
+
+// --- SOLUCIÓN AL "STICKY HOVER" EN MÓVILES ---
+document.addEventListener('touchend', (e) => {
+    const clickableElement = e.target.closest('button, a, .post-card, .project-card, .hamburger-menu, .themeToggle');
+    
+    if (clickableElement) {
+        setTimeout(() => {
+            clickableElement.blur();
+            
+            const originalPointerEvents = clickableElement.style.pointerEvents;
+            clickableElement.style.pointerEvents = 'none';
+            
+            void clickableElement.offsetHeight; 
+            
+            clickableElement.style.pointerEvents = originalPointerEvents;
+            
+        }, 150); 
+    }
 });
