@@ -10,8 +10,8 @@ const path = require('path');
 const yaml = require('js-yaml');
 
 // Configuración
-const POSTS_DIR = path.join(__dirname, '../content/posts');
-const OUTPUT_FILE = path.join(__dirname, '../content/data/posts-data.json');
+const POSTS_DIR = path.join(__dirname, '../../content/posts');
+const OUTPUT_FILE = path.join(__dirname, '../../content/data/posts-data.json');
 
 // Crear directorio de salida si no existe
 const dataDir = path.dirname(OUTPUT_FILE);

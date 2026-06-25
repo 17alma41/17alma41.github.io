@@ -123,11 +123,19 @@ class PostsManager {
             day: 'numeric'
         });
         
-        const cleanImage = post.image.startsWith('../') ? post.image.replace('../', '') : post.image;
+        let imageHtml = '';
+        let noImageClass = 'no-image'; // Por defecto no tiene imagen
+        
+        // Verificamos si hay imagen y si NO es el placeholder genérico por defecto
+        if (post.image && !post.image.includes('via.placeholder.com')) {
+            const cleanImage = post.image.startsWith('../') ? post.image.replace('../', '') : post.image;
+            imageHtml = `<img src="${cleanImage}" alt="${this.escapeHtml(post.title)}" class="post-image" loading="lazy">`;
+            noImageClass = ''; // Si tiene imagen real, le quitamos la clase
+        }
         
         return `
-            <article class="post-card" data-post-id="${post.id}">
-                <img src="${cleanImage}" alt="${post.title}" class="post-image" loading="lazy">
+            <article class="post-card ${noImageClass}" data-post-id="${post.id}">
+                ${imageHtml}
                 <div class="post-content">
                     <div class="post-header">
                         <h3 class="post-title">${this.escapeHtml(post.title)}</h3>
@@ -212,16 +220,30 @@ class PostsManager {
         const nextBtn = document.getElementById('next-pagination-btn');
         const numbersContainer = document.getElementById('pagination-numbers');
         
+        const paginationDiv = prevBtn ? prevBtn.closest('.modern-pagination') : null;
+        
+        // Si existe, lo mostramos u ocultamos dependiendo del número de páginas
+        if (paginationDiv) {
+            paginationDiv.style.display = totalPages > 1 ? 'flex' : 'none';
+        }
+        
         if (!numbersContainer) return;
         
-        if (prevBtn) prevBtn.disabled = this.currentPage === 1;
-        if (nextBtn) nextBtn.disabled = this.currentPage === totalPages || totalPages === 0;
+        if (prevBtn) {
+            prevBtn.disabled = this.currentPage === 1;
+            prevBtn.setAttribute('aria-disabled', prevBtn.disabled);
+        }
+        
+        if (nextBtn) {
+            nextBtn.disabled = this.currentPage === totalPages || totalPages === 0;
+            nextBtn.setAttribute('aria-disabled', nextBtn.disabled);
+        }
         
         numbersContainer.innerHTML = this.generatePageNumbers(this.currentPage, totalPages);
         
         document.querySelectorAll('.page-number').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const pageNum = parseInt(btn.dataset.page);
+            btn.addEventListener('click', (e) => {
+                const pageNum = parseInt(e.target.dataset.page);
                 this.goToPage(pageNum);
             });
         });
@@ -306,9 +328,13 @@ class PostsManager {
         });
         categoryEl.textContent = post.category;
         
+        /*
         const cleanImage = post.image.startsWith('../') ? post.image.replace('../', '') : post.image;
         imageEl.src = cleanImage;
         imageEl.alt = post.title;
+        */
+        imageEl.style.display = 'none';
+
 
         let htmlContent = '';
         if (typeof marked !== 'undefined') {

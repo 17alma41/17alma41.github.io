@@ -430,6 +430,22 @@ body.light-mode .post-markdown-content blockquote {
     color: #334155;
 }
 
+/* ESTILOS PARA POSTS SIN IMAGEN */
+.post-card.no-image {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+}
+
+.post-card.no-image .post-content {
+    width: 100%;
+    padding: 2.5rem; 
+}
+
+.post-card.no-image .post-title {
+    font-size: 1.5rem;
+}
+
 /* Código Inline (Ej: variables pequeñas) */
 body.light-mode .post-markdown-content code {
     background: #F1F5F9;
@@ -654,6 +670,7 @@ body.light-mode .post-markdown-content pre code {
     padding-bottom: 15px;
     display: inline-block;
     animation: slideInDown 0.4s ease-out;
+    width: fit-content;
 }
 
 /* ========================================
@@ -1429,21 +1446,51 @@ body.light-mode .post-markdown-content pre code {
    ======================================== */
 .about-section {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Ajusta el espacio respecto al título global */
+    animation: fadeIn 0.4s ease-out;
 }
 
-.about-content {
-    background: rgba(22, 27, 38, 0.5);
-    padding: 40px;
-    border-radius: 16px;
-    border: 1px solid rgba(56, 189, 248, 0.1);
-    backdrop-filter: blur(8px);
+
+/* La cuadrícula para imagen y texto */
+.about-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
 }
 
-.about-content p {
-    font-size: 1rem;
+.about-image img {
+    width: 100%;
+    height: 100%;
+    max-height: 600px;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.about-intro p, 
+.about-details p {
+    font-size: 1.25rem;
     line-height: 1.8;
     color: #E5E7EB;
-    margin-bottom: 16px;
+    font-weight: 400;
+    margin-bottom: 20px;
+}
+
+/* --- Adaptación al Modo Claro --- */
+body.light-mode .about-intro p, 
+body.light-mode .about-details p {
+    color: #475569;
+}
+
+/* --- Responsive (Tablets y Móviles) --- */
+@media (max-width: 1024px) {
+    .about-hero {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
 }
 
 /* ========================================
@@ -1645,3 +1692,4 @@ body.light-mode .post-markdown-content pre code {
         margin-bottom: 15px;
     }
 }
+

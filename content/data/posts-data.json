@@ -1,28 +1,52 @@
 {
-  "generated": "2026-03-22T10:24:42.667Z",
-  "totalPosts": 5,
+  "generated": "2026-06-25T13:02:59.335Z",
+  "totalPosts": 2,
   "categories": [
     {
       "name": "Attacks",
       "slug": "attacks",
-      "count": 2
+      "count": 0
     },
     {
       "name": "Forensics",
       "slug": "forensics",
-      "count": 1
+      "count": 0
     },
     {
       "name": "Tools",
       "slug": "tools",
-      "count": 1
+      "count": 2
     },
     {
       "name": "Writeups",
       "slug": "writeups",
-      "count": 1
+      "count": 0
     }
   ],
   "posts": [
+    {
+      "id": "gobuster-cheatsheet",
+      "slug": "gobuster-cheatsheet",
+      "title": "Gobuster Cheatsheet",
+      "description": "Gobuster Cheatsheet - Guía rápida para la enumeración de directorios, subdominios y virtual hosts con Gobuster.",
+      "date": "2026-06-25",
+      "image": "",
+      "category": "Tools",
+      "content": "# Gobuster Cheatsheet\n\nGuía rápida para la enumeración de **directorios**, **subdominios** y **virtual hosts** con Gobuster.\n\n---\n\n##  1. Modos de Operación\n\nGobuster no solo busca carpetas; funciona por **modos** según el objetivo.\n\n| Modo   | Comando            | ¿Para qué sirve? |\n|------|-------------------|------------------|\n| dir   | `gobuster dir`    | El más usado. Busca directorios y archivos en un servidor web. |\n| dns   | `gobuster dns`    | Busca subdominios (ej. `dev.google.com`) mediante fuerza bruta. |\n| vhost | `gobuster vhost`  | Busca Virtual Hosts (útil cuando varias webs comparten la misma IP). |\n\n---\n\n##  2. Parámetros Globales (Comunes)\n\nEstos parámetros funcionan en casi todos los modos.\n\n| Parámetro | Nombre | ¿Para qué sirve? |\n|---------|------|------------------|\n| `-u` | URL / Domain | Objetivo (ej. `http://10.129.1.1` o `google.com`). |\n| `-w` | Wordlist | Ruta al diccionario (ej. `/usr/share/wordlists/dirb/common.txt`). |\n| `-t` | Threads | Número de conexiones simultáneas (por defecto 10). Un T4/T5 de Nmap sería ~50–100. |\n| `-z` | No Progress | Oculta la barra de progreso (útil si la terminal se satura). |\n| `-v` | Verbose | Muestra todos los intentos, incluso los fallidos. |\n\n---\n\n## 3. Enumeración Web (`dir`)\n\nParámetros específicos para encontrar **archivos y carpetas ocultas**.\n\n| Parámetro | Nombre | ¿Para qué sirve? |\n|---------|------|------------------|\n| `-x` | Extensions | Busca archivos con extensiones específicas (ej. `-x php,txt,html`). |\n| `-s` | Status Codes | Muestra solo ciertos códigos (ej. `-s \"200,204,301\"`). |\n| `-b` | Blacklist | Oculta códigos molestos (ej. `-b \"404,403\"`). |\n| `-k` | Insecure | Salta la verificación SSL (útil con HTTPS mal configurado). |\n| `-a` | User Agent | Cambia el User-Agent para evitar protecciones básicas. |\n\n---\n\n## 4. Enumeración DNS y VHosts\n\nCuando el objetivo es un **dominio**, no solo una web.\n\n| Parámetro | Nombre | ¿Para qué sirve? |\n|---------|------|------------------|\n| `-d` | Domain | En modo `dns`, indica el dominio padre. |\n| `-i` | Show IP | Muestra la IP asociada a cada subdominio encontrado. |\n| `--append-domain` | Append | Añade automáticamente el dominio a cada palabra del diccionario. |\n\n---\n\n## 5. Salida de Datos\n\nGuarda resultados para informes o análisis posterior.\n\n| Parámetro | Nombre | ¿Para qué sirve? |\n|---------|------|------------------|\n| `-o` | Output | Guarda el resultado en un archivo (ej. `-o resultados.txt`). |\n| `--no-error` | No Errors | Oculta errores de conexión en pantalla. |\n\n---\n\n## Ejemplos Prácticos\n\n###  Escaneo Web Estándar (CTFs)\n\nComando ideal para empezar en cualquier máquina web:\n\n```bash\ngobuster dir -u http://<IP> \\\n-w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt \\\n-t 50\n```\n\n###  Búsqueda de Archivos Sensibles\n\nPara encontrar copias de seguridad, configs o scripts olvidados:\n\n```bash\ngobuster dir -u http://<IP> \\\n-w /usr/share/wordlists/dirb/common.txt \\\n-x php,txt,bak,zip,config \\\n-t 30\n```\n\n### Fuerza Bruta de Subdominios\n\nMuy útil en fases de reconocimiento inicial:\n\n```bash\ngobuster dns -d objetivo.com \\\n-w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt\n```",
+      "filename": "gobuster-cheatsheet.md",
+      "categoryFolder": "tools"
+    },
+    {
+      "id": "nmap-cheatsheet",
+      "slug": "nmap-cheatsheet",
+      "title": "Nmap Cheatsheet",
+      "description": "Nmap Cheatsheet - Comandos Esenciales Guía rápida de los parámetros más útiles de Nmap.",
+      "date": "2026-06-25",
+      "image": "",
+      "category": "Tools",
+      "content": "# Nmap Cheatsheet - Comandos Esenciales\n\nGuía rápida de los parámetros más útiles de Nmap.\n\n##  1. Escaneo de Puertos (Técnicas)\nDefine **cómo** se conecta Nmap a la máquina.\n\n| Parámetro | Nombre | Para qué sirve |\n| :--- | :--- | :--- |\n| `-sS` | **SYN Scan** (Stealth) | **El estándar.** Rápido y \"sigiloso\". No completa la conexión TCP. Requiere `sudo`. |\n| `-sT` | **Connect Scan** | Úsalo si **no tienes sudo**. Es más ruidoso (deja logs en la víctima). |\n| `-sU` | **UDP Scan** | Para escanear servicios UDP (DNS, SNMP, NTP). **Ojo:** Es muy lento. |\n\n## 2. Enumeración y Versiones\nSaca información detallada de lo que has encontrado.\n\n| Parámetro | Nombre | Para qué sirve |\n| :--- | :--- | :--- |\n| `-sV` | **Version Detection** | Intenta averiguar la **versión exacta** del servicio (ej. Apache 2.4.41). Vital para buscar exploits. |\n| `-O` | **OS Detection** | Intenta adivinar qué **Sistema Operativo** corre la víctima (Windows, Linux, etc). |\n| `-A` | **Aggressive Scan** | El \"Todo en Uno\". Activa detección de SO (`-O`), Versiones (`-sV`), Scripts (`-sC`) y Traceroute. |\n\n##  3. Definición de Objetivos y Puertos\nDefine **qué** vas a escanear.\n\n| Parámetro | Nombre | Para qué sirve |\n| :--- | :--- | :--- |\n| `-p-` | **All Ports** | Escanea los **65.535 puertos**. Si no lo pones, solo escanea los 1000 más comunes. |\n| `-p 80,443` | **Specific Ports** | Escanea solo los puertos que tú le digas (separados por coma). |\n| `-Pn` | **No Ping** | Asume que la máquina está encendida. Úsalo si Nmap dice *\"Note: Host seems down\"*. |\n| `--top-ports 100` | **Top Ports** | Escanea solo los 100 puertos más populares (muy rápido). |\n\n##  4. Scripts (NSE)\nEl verdadero poder de Nmap.\n\n| Parámetro | Nombre | Para qué sirve |\n| :--- | :--- | :--- |\n| `-sC` | **Default Scripts** | Lanza los scripts básicos y seguros (FTP anónimo, títulos HTTP, claves SSH por defecto...). |\n| `--script vuln` | **Vuln Scan** | Busca vulnerabilidades conocidas (CVEs) en los servicios encontrados. |\n| `--script \"smb*\"` | **Wildcard** | Ejecuta todos los scripts que empiecen por \"smb\" (útil para enumerar Windows). |\n\n## 5. Velocidad y Salida\nControla el tiempo y guarda tu trabajo.\n\n| Parámetro | Nombre | Para qué sirve |\n| :--- | :--- | :--- |\n| `-T4` | **Timing 4** | Acelera el escaneo. Es el estándar para CTFs. (T1 es paranoico, T5 es demasiado agresivo). |\n| `--min-rate 5000` | **Min Rate** | Fuerza a enviar paquetes muy rápido (útil si `-p-` tarda mucho). |\n| `-oA nombre` | **Output All** | Guarda el resultado en 3 formatos: `.nmap` (texto), `.gnmap` (grepable) y `.xml`. **Úsalo siempre.** |\n| `-v` | **Verbose** | Te muestra en pantalla lo que va encontrando en tiempo real, sin esperar al final. |\n\n---\n\n### 1. Escaneo Inicial (Rápido)\nPara ver qué hay abierto rápidamente.\n```bash\nnmap -p- --open -sS --min-rate 5000 -n -Pn <IP>\n```\n\n### 2. Escaneo detallado (Clásico)\nUna vez sabemos los puertos abiertos, hacemos un escaneo detallado.\n```bash\nnmap -p 22,80 -sC -sV -n -Pn <IP> -oN escaneo_detallado\n```\n\n### 3. Escaneo de vulnerabilidades\nPara buscar fallos de seguridad automáticamente.\n```bash\nnmap -p 445 --script vuln -Pn <IP>\n```",
+      "filename": "nmap-cheatsheet.md",
+      "categoryFolder": "tools"
+    }
   ]
 }
