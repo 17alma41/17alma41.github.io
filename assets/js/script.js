@@ -128,8 +128,7 @@ class PostsManager {
         
         // Verificamos si hay imagen y si NO es el placeholder genérico por defecto
         if (post.image && !post.image.includes('via.placeholder.com')) {
-            const cleanImage = post.image.startsWith('../') ? post.image.replace('../', '') : post.image;
-            imageHtml = `<img src="${cleanImage}" alt="${this.escapeHtml(post.title)}" class="post-image" loading="lazy">`;
+            imageHtml = `<img src="${post.image}" alt="${this.escapeHtml(post.title)}" class="post-image" loading="lazy">`;
             noImageClass = ''; // Si tiene imagen real, le quitamos la clase
         }
         

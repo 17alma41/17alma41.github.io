@@ -5,7 +5,7 @@
   "main": "scripts/generate-posts.js",
   "scripts": {
     "generate-posts": "node scripts/generate-posts.js",
-    "watch-posts": "nodemon --watch posts -e md --exec 'npm run generate-posts'"
+    "watch-posts": "nodemon --watch content/posts -e md --exec 'npm run generate-posts'"
   },
   "keywords": [
     "portfolio",

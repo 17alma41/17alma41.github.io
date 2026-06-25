@@ -897,7 +897,7 @@ body.light-mode .post-markdown-content pre code {
     content: "";
     width: 16px;
     height: 16px;
-    background-image: url('../images/icons/landpage/icons8-calendario-50.png');
+    background-image: url('../img/icons/icons8-calendario-50.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -1070,7 +1070,7 @@ body.light-mode .post-markdown-content pre code {
     content: "";
     width: 18px;
     height: 18px;
-    background-image: url('../images/icons/landpage/icons8-calendario-50.png');
+    background-image: url('../img/icons/icons8-calendario-50.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
