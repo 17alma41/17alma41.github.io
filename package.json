@@ -1,0 +1,24 @@
+{
+  "name": "alvaro-portfolio",
+  "version": "1.0.0",
+  "description": "Portfolio personal - Sistema de Posts con Markdown",
+  "main": "scripts/generate-posts.js",
+  "scripts": {
+    "generate-posts": "node scripts/generate-posts.js",
+    "watch-posts": "nodemon --watch content/posts -e md --exec 'npm run generate-posts'"
+  },
+  "keywords": [
+    "portfolio",
+    "posts",
+    "markdown"
+  ],
+  "author": "Álvaro Román",
+  "license": "MIT",
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "marked": "^11.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}

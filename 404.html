@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Redirect</title>
+    <script type="text/javascript">
+      // Redirigir a index.html preservando la ruta
+      // Esto es un truco para SPAs en GitHub Pages
+      
+      // Obtener la ruta actual
+      var location = window.location.pathname + window.location.search + window.location.hash;
+      
+      // Remover 404.html de la ruta si está presente
+      location = location.replace(/\/404\.html/, '');
+      
+      // Remover el repo name si existe (para 17alma41.github.io)
+      location = location.replace(/^\/17alma41\.github\.io/, '');
+      
+      // Asegurar que comienza con /
+      if (location === '' || location === '404.html') {
+        window.location.replace('/');
+      } else if (!location.startsWith('/')) {
+        window.location.replace('/' + location);
+      } else {
+        // Preservar la ruta enviándola como parámetro
+        window.location.replace('/?redirect=' + encodeURIComponent(location));
+      }
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
+    
