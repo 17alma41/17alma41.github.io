@@ -2,10 +2,6 @@
 
 /**
  * Post Generator Script
- * 
- * Este script lee archivos Markdown de la carpeta `posts/` y genera un archivo JSON
- * con metadatos de los posts para ser consumido por el frontend.
- * 
  * Uso: node assets/scripts/generate-posts.js
  */
 
