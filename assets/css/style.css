@@ -596,6 +596,10 @@ body.light-mode .post-markdown-content pre code {
     justify-content: center;
 }
 
+.about-social-links {
+    display: none !important;
+}
+
 
 .social-links a {
     display: inline-flex;
@@ -1637,6 +1641,12 @@ body.light-mode .about-details p {
 
     .post-nav-btn {
         width: 100%;
+    }
+
+    .about-social-links {
+        display: flex !important;
+        justify-content: flex-start !important; 
+        margin-top: 25px; 
     }
 }
 
