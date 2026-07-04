@@ -2,7 +2,7 @@
 
 /**
  * Post Generator Script
- * Uso: node assets/scripts/generate-posts.js
+ * Uso: node scripts/generate-posts.js
  */
 
 const fs = require('fs');
